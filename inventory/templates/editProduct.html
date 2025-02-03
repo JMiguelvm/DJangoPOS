@@ -1,0 +1,134 @@
+{% extends "./sidebar.html" %}
+
+{% block body %}
+<div class="modal fade show" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="position: static; padding-right: 17px; display: block;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class=" bg-primary text-white">
+            <div class="modal-header row justify-content-center align-items-center g-2">
+                <div class="col">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <i class="fa fa-tag"></i>
+                        Editar producto ID: {{product.id}}
+                    </h5>
+                </div>
+                <div class="col d-flex" style="justify-content: flex-end;">
+                    <form method="post" action="{% url 'deleteProduct' %}">
+                        {% csrf_token %}
+                        <button type="submit" name="productId" id="productId" value="{{product.id}}" class="btn btn-danger" onclick='confirm("¿Estás seguro de que deseas eliminar este producto?")' style="justify-self: flex-end;">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+          <div class="modal-body">
+            <form method="post" action="{% url 'editProduct' %}">
+            {% csrf_token %}
+            <div class="form-group">
+              <input type="text" name="bar_code" id="bar_code" class="form-control" value="{{product.bar_code}}">
+              <button class="w-100 btn btn-secondary fs-3" id="bar_code_btn" onclick="openModal('fBarCode')" type="button"><span id="bar_code_icon" class="fas fa-barcode" style="font-size: 60px;"></span><br><b id="bar_code_text">Vincular código de barras</b></button>
+            </div>
+            <div class="form-group">
+              <label>Categoria</label>
+              <select name="selectCategory" class="form-control text-primary" required>
+                <option disabled="" selected="">Por favor seleccione un categoria</option>
+                {% for category in categorys %}
+                  <option value="{{category.id}}" {% if product.category.id == category.id %}
+                    selected
+                  {% endif %}>{{category.name}}</option>
+                {% endfor %}
+              </select>
+              <small class="float-right">Categoria no listada? <a href="{% url 'categoryList' %}" data-toggle="modal" data-target="#addProductVendorModal">Agrega uno nuevo</a> </small>
+            </div>
+            <div class="form-group">
+              <label>Vendedor</label>
+              <select name="selectVendor" class="form-control text-primary" required>
+                <option disabled="" selected="">Por favor seleccione un vendedor</option>
+                {% for vendor in vendors %}
+                  <option value="{{vendor.id}}" {% if product.vendor.id == vendor.id %}
+                    selected
+                  {% endif %}>{{vendor.name}}</option>
+                {% endfor %}
+              </select>
+              <small class="float-right">Vendedor no listado? <a href="{% url 'vendorList' %}" data-toggle="modal" data-target="#addProductVendorModal">Agrega uno nuevo</a> </small>
+            </div>
+            <div class="form-group">
+              <label for="txtProductName">Nombre de producto</label>
+              <input type="hidden" name="productId" value="{{product.id}}">
+              <input type="text" class="form-control" name="txtProductName" id="txtProductName" value="{{product.name}}" placeholder="Ingresa el nombre del producto..." required="1">
+              <small class="text-muted">Se especifico con los nombres. Asegurate que sea único.</small>
+            </div>
+            <div class="form-group">
+              <label for="numberProductPrice">Precio de producto<small class="text-muted">(Costo por Unidad (C/U) )</small> </label>
+              <input type="number" class="form-control" name="numberProductPrice" id="numberProductPrice" value="{{productPriceInt}}" placeholder="Ingresa el costo del producto..." required="1">
+            </div>
+            <div class="form-group">
+              <label for="numberProductSellPrice">Precio de venta del producto</label>
+              <input type="number" class="form-control" name="numberProductSellPrice" id="numberProductSellPrice" value="{{productSellPriceInt}}" placeholder="Ingresa el costo del producto..." required="1">
+            </div>
+            <div class="form-group">
+              <label for="numberProductStock">Stock de producto</label>
+              <input type="number" class="form-control" name="numberProductStock" id="numberProductStock" value="{{product.stock}}" disabled>
+            </div>
+            <div class="form-group">
+              <label for="textAreaProductDescription">Descripción <small class="text-muted">(Opcional)</small></label>
+              <textarea name="textAreaProductDescription" id="textAreaProductDescription" class="form-control" cols="80" 
+              placeholder="{% if product.description == '' %}Sin descripción...{% else %}{{product.description}}{% endif %}"
+              >{% if product.description != '' %}{{product.description}}{% endif %}</textarea>
+            </div>
+            <small class="text-muted"><em>Por favor verifica la información antes de ingresar el producto.</em></small>
+          </div>
+            <div class="modal-footer">
+                <a href="{% url 'productList' %}" class="btn btn-secondary" style="text-decoration: none; color: white;">Cancelar</a>
+                <input type="submit" class="btn btn-primary" value="Editar producto">
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="productBackground" style="display: none;" class="modal-backdrop fade show"></div>
+  
+  <div class="modal fade show bg-opacity-25 bg-black align-content-center" id="fBarCode" data-bs-backdrop="static" data-bs-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLiveLabel" aria-modal="true" role="dialog" style="display: none;">
+    <div class="modal-dialog">
+      <div class="modal-content bg-info text-bg-danger">
+        <div class="modal-body">
+          <form onsubmit="processBarCode(event)" class="align-content-center text-center">
+            <input type="text" name="input_bar_code" id="fBarCode_input"><br>
+            <label for="input_bar_code" class="fs-2" style="cursor: pointer;"><b>ESCANEÉ EL CÓDIGO DE BARRAS</b></label>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+  <script>
+    var barCodeText = document.getElementById('bar_code');
+    var barCodeBtn = document.getElementById('bar_code_btn');
+    var barCodeIcon = document.getElementById('bar_code_icon');
+    var barCodeIText = document.getElementById('bar_code_text');
+    if(barCodeText.value !== '0') {
+      barCodeBtn.disabled = true;
+      barCodeBtn.className = 'w-100 btn btn-success fs-3';
+      barCodeIcon.className = 'fas fa-check';
+      barCodeIText.innerText = '';
+    }
+    function openModal(id) {
+      if (document.getElementById(id)) {
+        document.getElementById(id).style.display = 'block';
+        if (document.getElementById(id+'_input')) {
+          document.getElementById(id+'_input').focus();
+        }
+      }
+      
+    }
+    function processBarCode(event) {
+      event.preventDefault();
+      document.getElementById('fBarCode').style.display = 'none';
+      barCodeText.value = document.getElementById('fBarCode_input').value;
+      barCodeBtn.disabled = true;
+      barCodeBtn.className = 'w-100 btn btn-success fs-3';
+      barCodeIcon.className = 'fas fa-check';
+      barCodeIText.innerText = '';
+    }
+
+  </script>
+{% endblock %}

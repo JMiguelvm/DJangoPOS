@@ -1,0 +1,1 @@
+- Producto pueda tener varias categorias.

@@ -1,0 +1,54 @@
+{% extends "./sidebar.html" %}
+
+{% block body %}
+<div class="modal fade show" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="position: static; padding-right: 17px; display: block;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class=" bg-primary text-white">
+            <div class="modal-header row justify-content-center align-items-center g-2">
+                <div class="col">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <i class="fa fa-tag"></i>
+                        Editar vendedor ID: {{vendor.id}}
+                    </h5>
+                </div>
+                <div class="col d-flex" style="justify-content: flex-end;">
+                    <form method="post" action="{% url 'deleteVendor' %}">
+                        {% csrf_token %}
+                        <button type="submit" name="vendorId" id="vendorId" value="{{vendor.id}}" class="btn btn-danger" onclick='confirm("¿Estás seguro de que deseas eliminar este vendedor?")' style="justify-self: flex-end;">Eliminar</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+        
+          <div class="modal-body">
+            <form method="post" action="{% url 'editVendor' %}">
+            {% csrf_token %}
+            <div class="form-group">
+                <input type="hidden" name="vendorId" value="{{vendor.id}}">
+                <label for="txtVendorName">Nombre de vendedor</label>
+                <input type="text" class="form-control" name="txtVendorName" id="txtVendorName" value="{{vendor.name}}" placeholder="Ingresa el nombre del vendedor..." required="1">
+                <small class="text-muted">Asegurate que sea único.</small>
+            </div>
+            <div class="form-group">
+                <label for="numberVendorNumberPhone">Número de teléfono del vendedor</label>
+                <input type="number" class="form-control" name="numberVendorNumberPhone" id="numberVendorNumberPhone" value="{{vendor.numberPhone}}" placeholder="Ingresa el número del vendedor..." required="1">
+            </div>
+            <div class="form-group">
+              <label for="textAreaVendorDescription">Descripción <small class="text-muted">(Opcional)</small></label>
+              <textarea name="textAreaVendorDescription" id="textAreaVendorDescription" class="form-control" cols="80" 
+              placeholder="{% if vendor.description == '' %}Sin descripción...{% else %}{{vendor.description}}{% endif %}"
+              >{% if vendor.description != '' %}{{vendor.description}}{% endif %}</textarea>
+            </div>
+            <small class="text-muted"><em>Por favor verifica la información antes de ingresar el producto.</em></small>
+          </div>
+            <div class="modal-footer">
+                <button id="closeAddProduct" class="btn btn-secondary" type="button" data-dismiss="modal"><a href="vendorList" style="text-decoration: none; color: white;">Cancelar</a></button>
+                <input type="submit" class="btn btn-primary" value="Editar producto">
+            </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="productBackground" style="display: none;" class="modal-backdrop fade show"></div>
+{% endblock %}

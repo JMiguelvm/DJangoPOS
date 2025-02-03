@@ -1,0 +1,124 @@
+{% extends "./sidebar.html" %}
+
+{% block body %}
+<div class="modal fade show" id="addProductModal" tabindex="-1" role="dialog" aria-labelledby="exampleModalLabel" style="position: static; padding-right: 17px; display: block;">
+    <div class="modal-dialog modal-lg" role="document">
+      <div class="modal-content">
+        <div class=" bg-primary text-white">
+            <div class="modal-header row justify-content-center align-items-center g-2">
+                <div class="col">
+                    <h5 class="modal-title" id="exampleModalLabel">
+                        <i class="fa fa-user"></i>
+                        Deudas de cliente ID: {{customer.id}}
+                    </h5>
+                </div>
+                <div class="col d-flex" style="justify-content: flex-end;">
+                  <a href="{% url 'customerList' %}" class="btn btn-secondary">Volver</a>
+                </div>
+            </div>
+        </div>
+        
+          <div class="modal-body">
+            <small>Cliente:</small>
+            <h3>{{customer.name}}</h3>
+            <small class="float-right">Deudas:</small>
+            <span id="btnAdd" class="badge text-bg-success p-1" style="cursor: pointer; height: 20px;">Añadir</span>
+            <span id="btnDelete" class="badge text-bg-danger p-1" style="cursor: pointer; height: 20px;">Eliminar</span>
+          </div>
+          <div class="modal-footer" style="max-height: 500px; overflow-y: auto;">
+            <table class="table table-bordered dataTable" id="dataTable" width="100%" cellspacing="0" role="grid" aria-describedby="dataTable_info" style="width: 100%;">
+              <thead>
+                <tr role="row"><th tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Product Name: activate to sort column ascending" style="width: 178.078px;">
+                  Fecha
+                </th>
+                <th class="" tabindex="0" aria-controls="dataTable" rowspan="1" colspan="1" aria-label="Product Type: activate to sort column ascending" style="width: 227.359px;">
+                  Valor
+                </th></tr>
+              </thead>
+              <tbody>
+                <tr id="debtAdd" style="display: none;">
+                  <form method="post" action="{% url 'addDebt' %}">
+                    {% csrf_token %}
+                    <td>
+                      <input type="datetime-local" class="form-control" name="debtDate" required>
+                    </td>
+                    <td>
+                      <div class="input-group mb-3">
+                        <input type="number" name="debtAmount" class="form-control" placeholder="Ingrese el valor de deuda" aria-label="Ingrese el valor de deuda" aria-describedby="button-addon2" required>
+                        <button class="btn btn-success" name="debtCustomer" value="{{customer.id}}" type="submit" id="button-addon2">Agregar</button>
+                      </div>
+                    </td>
+                  </form>
+                </tr>
+                {% for debt in debts %}
+                  <tr>
+                    <td style="align-content: center;">
+                      <form class="debtDelete" method="post" action="{% url 'deleteDebt' %}" style="display: none;">
+                        {% csrf_token %}
+                        <button type="submit" name="debtId" value="{{debt.id}}" class="btn btn-danger mt-2 mb-2" style="--bs-btn-padding-y: .25rem; --bs-btn-padding-x: .6rem; --bs-btn-font-size: 1rem;" onclick='confirm("¿Estás seguro de que deseas eliminar esta deuda?")'>
+                          <i class="fa fa-trash"></i>
+                        </button>
+                      </form>
+                      {{debt.date}}
+                    </td>
+                    {% if debt.amount >= 0 %}
+                    <td>
+                      <small class="d-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-success-subtle border border-success-subtle rounded-2">
+                        +<span class="debtAmount">
+                          {{debt.amount}}
+                        </span>
+                      </small>
+                    </td>
+                    {% elif debt.amount < 0 %}
+                    <td>
+                      <small class="debtAmount d-inline-flex mb-3 px-2 py-1 fw-semibold text-success-emphasis bg-danger-subtle border border-danger-subtle rounded-2">
+                        {{debt.amount}}
+                      </small>
+                    </td>
+                    {% endif %}
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          </div>
+          {% if totalAmount < 0 %}
+          <div class="modal-body">
+            <div class="alert alert-danger d-flex align-items-center" style="height: 40px;" role="alert">
+              <i class="fa fa-exclamation-triangle" style="margin-right: 5px;"></i>
+              <div>
+                El cliente debe <b class="debtAmount">{{totalAmount}}</b> pesos.
+              </div>
+            </div>
+          </div>
+          {% endif %}
+      </div>
+    </div>
+  </div>
+  <div id="productBackground" style="display: none;" class="modal-backdrop fade show"></div>
+  <script>
+    function formatNumber(number) {
+      return number.toLocaleString('es-ES');
+    }
+    
+    document.querySelectorAll('.debtAmount').forEach(element => {
+      const amount = parseFloat(element.textContent);
+      element.textContent = formatNumber(amount);
+    });
+
+    var debtAdd = document.getElementById('debtAdd');
+    var btnAdd = document.getElementById('btnAdd');
+    var btnDelete = document.getElementById('btnDelete');
+    var deptDelete = document.querySelectorAll('.debtDelete');
+
+    btnAdd.addEventListener("click", function () {
+      debtAdd.style.display = 'table-row';
+    });
+
+    btnDelete.addEventListener("click", function () {
+      deptDelete.forEach(dept => {
+        dept.style.display = 'inline-block';
+      })
+    });
+
+  </script>
+{% endblock %}
