@@ -1,0 +1,12 @@
+/.vscode
+/.obsidian
+/core/db.sqlite3
+/core/dashboard/__pycache__
+/core/dashboard/migrations/__pycache__
+/core/categorys/__pycache__
+/core/categorys/migrations/__pycache__
+/core/core/__pycache__
+/core/products/__pycache__
+/core/products/migrations/__pycache__
+/core/vendors/__pycache__
+/core/vendors/migrations/__pycache__
