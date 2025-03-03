@@ -1,0 +1,70 @@
+{% extends "../sidebar.html" %}
+
+{% block body %}
+{% load static %}
+<script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
+<div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
+    <div class="form-group">
+        <h3 class="m-0">$name</h3>
+        <small class="text-muted">ID: $id</small>
+    </div>
+    <div class="input-group mb-3">
+        <h6 class=" navbar-text pe-3">Nombre de producto:</h6>
+        <span class="input-group-text" id="basic-addon1"><span class="fas fa-dice-d6"></span></span>
+        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
+    </div>
+    <div class="input-group mb-3">
+        <h6 class=" navbar-text pe-3">Icono:</h6>
+        <h2 class="accordion-header form-control" id="flush-headingOne">
+            <button class="accordion-button collapsed" type="button" id="icon-sel">
+              Selecciona un icono..
+            </button>
+        </h2>
+        <label class="input-group-text" for="icon-sel" style="cursor: pointer;"><span class="fas fa-angle-down"></span></label>
+    </div>
+    <div class="input-group mb-3 card p-3 d-flex flex-row overflow-auto" style="height: 200px;" id="icon_div">
+        <div class="card d-inline-block btn btn-light p-0 align-content-center me-1 mb-1" style="width: 5rem; height: 5rem;">
+            <span class="fab fa-500px" style="font-size: 3rem;"></span>
+        </div>
+    </div>
+    <div class="input-group mb-3">
+        <h6 class=" navbar-text pe-3">Descripción:</h6>
+        <textarea class="form-control" aria-label="With textarea"></textarea>
+    </div>
+    <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
+        <button type="button" class="btn btn-outline-secondary">Cancelar</button>
+        <button type="button" class="btn btn-outline-danger">Eliminar</button>
+        <button type="button" class="btn btn-outline-success">Guardar</button>
+    </div>
+</div>
+
+<script>
+    /*
+    
+    for (var icon in fontAwesomeClasses) {
+    $('#icon_div').html($('#icon_div').html() + `
+    <div class="card d-inline-block btn btn-light p-0 align-content-center me-1 mb-1" style="width: 5rem; height: 5rem;">
+        <span class="fas ${fontAwesomeClasses[icon]}" style="font-size: 3rem;"></span>
+    </div>
+    `);
+  }
+    
+    */
+    $('#buy-price').priceFormat({
+        prefix: '',
+        centsLimit: 0
+    });
+    $('#sell-price').priceFormat({
+        prefix: '',
+        centsLimit: 0
+    });
+
+    $(document).ready(function() {
+        $('#icon-sel').on('click', function(event) {
+            alert('button');
+        });
+    });
+    
+</script>
+{% endblock %}

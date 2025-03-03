@@ -1,4 +1,4 @@
-{% extends "./sidebar.html" %}
+{% extends "../sidebar.html" %}
 
 {% block body %}
 {% load static %}
@@ -6,25 +6,12 @@
 <script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
 <div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
     <div class="form-group">
-        <h3 class="m-0">$name</h3>
-        <small class="text-muted">ID: $id</small>
+        <h3 class="m-0 pb-3">Crear producto</h3>
     </div>
     <div class="input-group mb-3">
         <h6 class=" navbar-text pe-3">Nombre de producto:</h6>
         <span class="input-group-text" id="basic-addon1"><span class="fas fa-dice-d6"></span></span>
-        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Precio de compra:</h6>
-        <span class="input-group-text">COP$</span>
-        <span class="input-group-text" id="buy-price-input">$actualBPrice</span>
-        <input type="text" class="form-control" id="buy-price">
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Precio de venta:</h6>
-        <span class="input-group-text">COP$</span>
-        <span class="input-group-text" id="sell-price-input">$actualSPrice</span>
-        <input type="text" class="form-control" id="sell-price">
+        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1">
     </div>
     <div class="input-group mb-3">
         <h6 class=" navbar-text pe-3">Categoria:</h6>
@@ -49,7 +36,7 @@
       
     <div class="input-group mb-3">
         <h6 class=" navbar-text pe-3">Descripción:</h6>
-        <textarea class="form-control" aria-label="With textarea"></textarea>
+        <textarea class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional..."></textarea>
     </div>
 
     <div class="input-group mb-3">
@@ -61,20 +48,11 @@
 
     <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
         <button type="button" class="btn btn-outline-secondary">Cancelar</button>
-        <button type="button" class="btn btn-outline-danger">Eliminar</button>
         <button type="button" class="btn btn-outline-success">Guardar</button>
     </div>
 </div>
 
 <script>
-    $('#buy-price').priceFormat({
-        prefix: '',
-        centsLimit: 0
-    });
-    $('#sell-price').priceFormat({
-        prefix: '',
-        centsLimit: 0
-    });
 
     $(document).ready(function() {
         $('#bar-code').on('keydown', function(event) {
