@@ -41,7 +41,7 @@
             </a>
           </li>
           <li>
-            <a href="pendiente$ 'customerList' %}" class="row nav-link text-white {% if request.path == '/customer' %}active{% endif %}">
+            <a href="{% url 'customers:index' %}" class="row nav-link text-white {% if request.path == '/customers/' %}active{% endif %}">
                 <span height="16" width="16" class="col-1 bi pe-none me-2 fas fa-user"></span>
                 <span class="col-4">Clientes</span>
             </a>

@@ -10906,7 +10906,7 @@
 			 */
 			entries: {
 				_: "entradas",
-				1: "entrrada"
+				1: "entrada"
 			},
 	
 			/**
