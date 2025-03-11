@@ -2,20 +2,49 @@
 
 {% block body %}
 {% load static %}
-<div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
-    <div class="form-group">
-        <h3 class="m-0">$name</h3>
-        <small class="text-muted">ID: $id</small>
+<script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/dataTables1.js' %}"></script>
+<div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1200px;"> 
+    <div class="container align-content-center overflow-auto">
+        <h3 class="mb-3">Seleccione el producto a registrar</h3>
+        <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Office</th>
+                    <th>Age</th>
+                    <th>Start date</th>
+                    <th>Salary</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class=" d-flex justify-content-between">Tiger Nixon<a href="{% url 'customers:edit' %}">Seleccionar</a></td>
+                    <td>System Architect</td>
+                    <td>Edinburgh</td>
+                    <td>61</td>
+                    <td>2011-04-25</td>
+                    <td>$320,800</td>
+                </tr>
+            </tbody>
+            <tfoot>
+                <tr>
+                    <th>Name</th>
+                    <th>Position</th>
+                    <th>Office</th>
+                    <th>Age</th>
+                    <th>Start date</th>
+                    <th>Salary</th>
+                </tr>
+            </tfoot>
+        </table>
     </div>
-    
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Nombre de cliente:</h6>
-        <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-tag"></span></span>
-        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
-    </div>
-    <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
-        <a href="{% url 'customers:index' %}" class="btn btn-outline-secondary">Cancelar</a>
-        <button type="button" class="btn btn-outline-success">Guardar</button>
+    <div class="btn-group input-group mt-3" role="group" aria-label="Basic outlined example">
+        <a href="{% url 'stock:index' %}" class="btn btn-outline-secondary">Cancelar</a>
     </div>
 </div>
+<script>
+    new DataTable('#productos');
+</script>
 {% endblock %}

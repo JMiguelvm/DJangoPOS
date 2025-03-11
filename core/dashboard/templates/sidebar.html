@@ -54,7 +54,7 @@
             </a>
           </li>
           <li>
-            <a href="pendiente$ 'productStockList' %}" class="row nav-link text-white {% if request.path == '/stock' %}active{% endif %}">
+            <a href="{% url 'stock:index' %}" class="row nav-link text-white {% if request.path == '/stock/' %}active{% endif %}">
                 <span height="16" width="16" class="col-1 bi pe-none me-2 fas fa-boxes-stacked"></span>
                 <span class="col-4">Inventario</span>
             </a>
