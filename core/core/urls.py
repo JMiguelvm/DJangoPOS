@@ -24,5 +24,6 @@ urlpatterns = [
     path("categorys/", include("categorys.urls", namespace='categorys')),
     path("customers/", include("customers.urls", namespace='customers')),
     path("stock/", include("stock.urls", namespace='stock')),
+    path("pos/", include("pos.urls", namespace='pos')),
     path('admin/', admin.site.urls),
 ]

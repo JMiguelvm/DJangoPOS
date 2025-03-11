@@ -42,7 +42,8 @@ INSTALLED_APPS = [
     'dashboard',
     'categorys',
     'customers',
-    'stock'
+    'stock',
+    'pos'
 ]
 
 MIDDLEWARE = [
