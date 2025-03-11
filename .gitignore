@@ -13,4 +13,6 @@
 /core/vendors/migrations/__pycache__
 /core/customers/__pycache__
 /core/customers/migrations/__pycache__
+/core/stock/__pycache__
+/core/stock/migrations/__pycache__
 /venv
