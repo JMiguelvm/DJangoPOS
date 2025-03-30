@@ -16,11 +16,32 @@
     </head>
 <body>
     <div class="d-flex align-items-stretch border-danger border p-3" style="height: 100vh;">
-        <div class="p-2 border-danger border flex-fill">Flex item</div>
+        <div class="p-2 border-danger border flex-fill">
+            <!-- Barra lateral izquierda -->
+            {% include 'pos/product_list.html' %}
+        </div>
         <div class="d-flex flex-column border-danger border-bottom border-top" style="width: 500px;">
-            <!-- Barra lateral -->
+            <!-- Barra lateral derecha -->
             {% include 'pos/order_sumary.html' %}
         </div>
     </div>
+    <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+    <script src="{% static 'js/dataTables1.js' %}"></script>
+    <script>
+        new DataTable('#productos', {
+            initComplete: function() {
+                $('#productos_wrapper')
+                    .removeClass()
+                    .addClass('dt-container border p-3 dataTables_wrapper');
+            }
+        });
+        $(document).ready(function() {
+            $('#bar-code').on('keydown', function(event) {
+                if (event.keyCode === 13) {
+                    $('#bar-code').prop("disabled", true)
+                }
+            });
+        });
+    </script>
 </body>
 </html>

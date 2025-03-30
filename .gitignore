@@ -18,3 +18,4 @@
 /core/pos/__pycache__
 /core/pos/migrations/__pycache__
 /venv
+.qodo
