@@ -4,22 +4,26 @@
 {% load static %}
 <div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
     <div class="form-group">
-        <h3 class="m-0">$name</h3>
-        <small class="text-muted">ID: $id</small>
+        <h3 class="m-0">Crear categoria</h3>
     </div>
-    
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Nombre de categoria:</h6>
-        <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-tag"></span></span>
-        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Descripción:</h6>
-        <textarea class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional..."></textarea>
-    </div>
-    <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
-        <a href="{% url 'categorys:index' %}" class="btn btn-outline-secondary">Cancelar</a>
-        <button type="button" class="btn btn-outline-success">Guardar</button>
-    </div>
+    <form action="{% url 'categorys:create' %}" method="post">
+        {% csrf_token %} 
+        <!-- NAME -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Nombre de categoria:</h6>
+            <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-tag"></span></span>
+            <input name="name" type="text" class="form-control" placeholder="Nombre de categoria..">
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Descripción:</h6>
+            <textarea name="description" class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional..."></textarea>
+        </div>
+        <!-- SUBMIT -->
+        <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
+            <a href="{% url 'categorys:index' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

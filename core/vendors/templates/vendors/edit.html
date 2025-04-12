@@ -4,23 +4,34 @@
 {% load static %}
 <div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
     <div class="form-group">
-        <h3 class="m-0">$name</h3>
-        <small class="text-muted">ID: $id</small>
+        <h3 class="m-0">{{ vendor.name }}</h3>
+        <small class="text-muted">ID: {{ vendor.id }}</small>
     </div>
-    
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Nombre de vendedor:</h6>
-        <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-tag"></span></span>
-        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Descripción:</h6>
-        <textarea class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional..."></textarea>
-    </div>
-    <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
-        <a href="{% url 'vendors:index' %}" class="btn btn-outline-secondary">Cancelar</a>
-        <button type="button" class="btn btn-outline-danger">Eliminar</button>
-        <button type="button" class="btn btn-outline-success">Guardar</button>
-    </div>
+    <form action="{% url 'vendors:edit'%}" method="post">
+        {% csrf_token %}
+        <!-- ID -->
+        <input type="hidden" name="id" value="{{ vendor.id }}">
+        <!-- NAME -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Nombre de vendedor:</h6>
+            <span class="input-group-text" id="basic-addon1"><span class="fas fa-user-tag"></span></span>
+            <input name="name" type="text" class="form-control" value="{{ vendor.name }}" placeholder="Nombre de vendedor..." required>
+        </div>
+        <!-- NUMBER -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Número:</h6>
+            <input name="number" type="number" placeholder="Ingrese el número del vendedor..." id="number" class="form-control" value="{{ vendor.numberPhone }}">
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Descripción:</h6>
+            <textarea name="description" class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional...">{{ vendor.description }}</textarea>
+        </div>
+        <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
+            <a href="{% url 'vendors:index' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <a href="{% url 'vendors:edit' %}?delete={{ vendor.id }}" class="btn btn-outline-danger">Eliminar</a>
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+        </div>
+    </form>
 </div>
 {% endblock %}

@@ -6,52 +6,60 @@
 <script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
 <div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
     <div class="form-group">
-        <h3 class="m-0">$name</h3>
-        <small class="text-muted">ID: $id</small>
+        <h3 class="m-0">{{ product.name }}</h3>
+        <small class="text-muted">ID: {{ product.id }}</small>
     </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Nombre de producto:</h6>
-        <span class="input-group-text" id="basic-addon1"><span class="fas fa-dice-d6"></span></span>
-        <input type="text" class="form-control" placeholder="Nombre de producto" aria-label="Nombre de producto" aria-describedby="basic-addon1" value="$name">
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Categoria:</h6>
-        <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-list"></span></label>
-        <select class="form-select" id="inputGroupSelect01">
-            <option selected>Choose...</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-        </select>
-    </div>
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Vendedor:</h6>
-        <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-truck-ramp-box"></span></label>
-        <select class="form-select" id="inputGroupSelect01">
-            <option selected>Choose...</option>
-            <option value="1">One</option>
-            <option value="2">Two</option>
-            <option value="3">Three</option>
-        </select>
-    </div>
-      
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Descripción:</h6>
-        <textarea class="form-control" aria-label="With textarea"></textarea>
-    </div>
-
-    <div class="input-group mb-3">
-        <h6 class=" navbar-text pe-3">Código de barras:</h6>
-        <span class="input-group-text"><span class="fas fa-barcode"></span></span>
-        <input type="text" class="form-control" id="bar-code" placeholder="Código de barras" aria-label="Código de barras">
-        <label class="btn btn-outline-secondary" for="bar-code">Editar</label>
-    </div>
-
-    <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
-        <button type="button" class="btn btn-outline-secondary">Cancelar</button>
-        <button type="button" class="btn btn-outline-danger">Eliminar</button>
-        <button type="button" class="btn btn-outline-success">Guardar</button>
-    </div>
+    <form action="{% url 'products:edit' %}?id={{ product.id }}" method="post">
+        {% csrf_token %}
+        <!-- ID -->
+        <input type="hidden" name="id" value="{{ product.id }}">
+        <!-- NAME -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Nombre de producto:</h6>
+            <span class="input-group-text" id="basic-addon1"><span class="fas fa-dice-d6"></span></span>
+            <input name="name" type="text" class="form-control" placeholder="Nombre de producto" value="{{ product.name }}" required>
+        </div>
+        <!-- CATEGORY -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Categoria:</h6>
+            <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-list"></span></label>
+            <select name="category" class="form-select" id="inputGroupSelect01" required>
+                <option disabled value="" selected>Seleccione...</option>
+                {% for category in categorys %}
+                <option value="{{category.id}}" {% if category.id == product.category.id %}selected{% endif %}>{{category.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- VENDOR -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Vendedor:</h6>
+            <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-truck-ramp-box"></span></label>
+            <select name="vendor" class="form-select" id="inputGroupSelect01" required>
+                <option disabled value="" selected>Seleccione...</option>
+                {% for vendor in vendors %}
+                <option value="{{vendor.id}}" {% if vendor.id == product.vendor.id %}selected{% endif %}>{{vendor.name}}</option>
+                {% endfor %}
+            </select>
+        </div>
+        <!-- DESCRIPTION -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Descripción:</h6>
+            <textarea name="description" class="form-control" aria-label="Ingrese su descripción opcional..." placeholder="Ingrese su descripción opcional...">{{ product.description }}</textarea>
+        </div>
+        <!-- BAR CODE -->
+        <div class="input-group mb-3">
+            <h6 class=" navbar-text pe-3">Código de barras:</h6>
+            <span class="input-group-text"><span class="fas fa-barcode"></span></span>
+            <input name="bar_code" type="text" class="form-control" id="bar-code" placeholder="Código de barras" value="{{ product.bar_code }}" aria-label="Código de barras">
+            <label class="btn btn-outline-secondary" for="bar-code">Editar</label>
+        </div>
+        <!-- SUBMIT -->
+        <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
+            <a href="{% url 'products:index' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <a href="{% url 'products:edit' %}?delete={{ product.id }}" class="btn btn-outline-danger">Eliminar</a>
+            <button type="submit" class="btn btn-outline-success">Guardar</button>
+        </div>
+    </form>
 </div>
 
 <script>

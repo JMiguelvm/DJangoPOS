@@ -10,32 +10,19 @@
     <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
             </tr>
         </thead>
         <tbody>
+            {% for category in categorys %}
             <tr>
-                <td class=" d-flex justify-content-between">Tiger Nixon<a href="{% url 'categorys:edit' %}">Editar</a></td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011-04-25</td>
-                <td>$320,800</td>
-            </tr>
+                <td class=" d-flex justify-content-between">{{category.name}}<a href="{% url 'categorys:edit' %}?id={{category.id}}">Editar</a></td>
+            </tr>  
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
             </tr>
         </tfoot>
     </table>
