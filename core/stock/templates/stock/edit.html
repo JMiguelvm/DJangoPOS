@@ -3,68 +3,138 @@
 {% block body %}
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
 <script src="{% static 'js/dataTables1.js' %}"></script>
+<script src="{% static 'js/notify.min.js' %}"></script>
+<script src="{% static 'js/jquery-confirm.min.js' %}"></script>
 <div class="container align-content-center overflow-auto " style="margin:  5rem auto;">
     <div class="form-group text-center mb-3">
-        <h3 class="m-0"><a href="#">Producto</a></h3>
-        <small class="text-info"><i>Inventario actual: $debt</i></small>
+        <h3 class="m-0"><a href="{% url 'products:index' %}">{{ product_s.product.name }}</a></h3>
+        <small class="text-info"><i>Inventario actual: {{ product_s.stock }}</i></small>
     </div>
     <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
         <thead>
             <tr>
                 <th>Fecha</th>
-                <th>Mes</th>
                 <th>Cantidad</th>
+                <th>Precio de compra (C/U)</th>
+                <th>Precio total</th>
             </tr>
         </thead>
         <tbody>
-            <tr class="table-danger">
-                <td class=" d-flex justify-content-between">2011-04-25<a href="#">Eliminar</a></td>
-                <td>Marzo</td>
-                <td>$320,800</td>
-            </tr>
-            <tr>
-                <td class=" d-flex justify-content-between">2015-04-25<a href="#">Eliminar</a></td>
-                <td>Abril</td>
-                <td>$10,800</td>
-            </tr>
-            <tr>
-                <td class=" d-flex justify-content-between">2023-05-25<a href="#">Eliminar</a></td>
-                <td>Marzo</td>
-                <td>$520,800</td>
-            </tr>
+            {% for item in items %}
+            <tr {% if item.voided %}class="table-secondary" style="user-select: none;"{% elif item.quantity < 0 %}class="table-danger"{% endif %}>
+                <td class=" d-flex justify-content-between">{{ item.date }}
+                    {% if not item.voided and item.quantity > 0 %}
+                    <button data-id="{{ item.id }}" class="btn p-0 btn-link void_i">Anular</button>
+                    {% elif item.voided %}
+                    <i>Anulado</i>
+                    {% endif %}
+                    </td>
+                <td>{{ item.quantity }}</td>
+                <td><span class="pricef">{{ item.buy_price }}</span></td>
+                <td><span class="pricef">{{ item.total }}</span></td>
+            </tr> 
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
                 <th>Fecha</th>
-                <th>Mes</th>
                 <th>Cantidad</th>
+                <th>Precio de compra (C/U)</th>
+                <th>Precio total</th>
             </tr>
         </tfoot>
     </table>
-    <div class="container border mt-3 p-2" id="debtDiv" style="display: none;">
-        <div class=" input-group">
-            <input type="datetime-local" name="" id="" class="form-control">
-            <input type="number" name="" id="" placeholder="Cantidad" class="form-control">
-            <input type="number" name="" id="" placeholder="Precio de compra" class="form-control">
-            <button class="btn btn-outline-secondary" type="button">Aceptar</button>
-        </div>
+    <div class="container border mt-3 p-2" id="invDiv" style="display: none;">
+        <!-- ADD INVENTORY -->
+        <form action="{% url 'stock:create' %}" method="post">
+            {% csrf_token %}
+            <div class=" input-group">
+                <input type="hidden" name="id" value="{{ product_s.id }}">
+                <input type="datetime-local" name="datetime" class="form-control" required>
+                <input type="number" min="0" name="amount" placeholder="Cantidad" class="form-control" required>
+                <input type="number" min="0" name="price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
+                <button class="btn btn-outline-secondary" type="submit">Aceptar</button>
+            </div>
+        </form>
     </div>
     <div class="btn-group input-group mt-3" role="group" aria-label="Basic outlined example">
-        <button type="button" class="btn btn-outline-primary" id="debtBtn">Añadir inventario</button>
+        <button type="button" class="btn btn-outline-primary" id="invBtn">Añadir inventario</button>
     </div>
     <div class="btn-group input-group mt-3" role="group" aria-label="Basic outlined example">
-        <a href="{% url 'customers:index' %}" class="btn btn-outline-secondary">Cancelar</a>
-        <button type="button" class="btn btn-outline-danger">Eliminar</button>
-        <button type="button" class="btn btn-outline-success">Guardar</button>
+        <a href="{% url 'stock:index' %}" class="btn btn-outline-secondary">Volver</a>
+        <button type="button" id="deleteBtn" class="btn btn-outline-danger">Eliminar</button>
     </div>
 </div>
 <script>
     new DataTable('#productos');
     $(document).ready(function(){
-        $("#debtBtn").click(function(){
-            $("#debtDiv").show();
+        $("#invBtn").click(function(){
+            $("#invDiv").show();
+        });
+        $(".void_i").click(function(){
+            const id = $(this).data("id");
+            $.confirm({
+                title: 'Anular',
+                content: '¿Está seguro de anular el registro? Esto no se puede revertir.',
+                buttons: {
+                    confirmar: {
+                        action: function () {
+                            window.location.href = "{% url 'stock:create' %}?void=" + id;
+                        },
+                        btnClass: 'btn-danger'
+                    },
+                    cancelar: function () {}
+                }
+            });
+        });
+        
+        $("#deleteBtn").click(function(){
+            $.confirm({
+                title: 'Eliminar',
+                content: '¿Está seguro de eliminar el registro? Esto eliminara todas las entradas y salidas de inventario registradas en este producto.',
+                buttons: {
+                    confirmar: {
+                        action: function () {
+                            window.location.href = "{% url 'stock:create' %}?delete_s={{ product_s.id }}";
+                        },
+                        btnClass: 'btn-danger'
+                    }
+                    ,
+                    cancelar: function () {
+                    }
+                }
+            })
+        });
+    });
+    $('.pricef').each(function() {
+        $(this).attr("data-price", $(this).text())
+        $(this).priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
         });
     });
 </script>
+
+{% if messages %}
+  <script>
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        $.notify("{{ message|escapejs }}", "success");
+      {% elif message.tags == 'info' %}
+        $.notify("{{ message|escapejs }}", "info");
+      {% elif message.tags == 'warning' %}
+        $.notify("{{ message|escapejs }}", "warn");
+      {% elif message.tags == 'error' %}
+        $.notify("{{ message|escapejs }}", "error");
+      {% else %}
+        $.notify("{{ message|escapejs }}", "info");
+      {% endif %}
+    {% endfor %}
+  </script>
+{% endif %}
+
+    
 {% endblock %}

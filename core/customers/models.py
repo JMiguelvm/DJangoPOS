@@ -9,7 +9,7 @@ class Customer(models.Model):
 
 class Debt(models.Model):
     customer = models.ForeignKey(Customer, on_delete=models.CASCADE, null=True)
-    amount = models.FloatField()
+    amount = models.IntegerField()
     date = models.DateTimeField(default=timezone.now, null=True)
 
     def __str__(self):

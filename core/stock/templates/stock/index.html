@@ -4,38 +4,32 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'js/dataTables1.js' %}"></script>
+<script src="{% static 'js/notify.min.js' %}"></script>
 <div class="container align-content-center overflow-auto " style="margin:  5rem auto;">
     <h3 class="m-0">Inventario</h3>
     <small><a href="{% url 'stock:create' %}">Añadir producto</a></small>
     <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
+                <th>Vendedor</th>
+                <th>Stock</th>
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td class=" d-flex justify-content-between">Tiger Nixon<a href="{% url 'stock:edit' %}">Editar</a></td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011-04-25</td>
-                <td>$320,800</td>
-            </tr>
+            {% for product in pstock %}
+                <tr>
+                    <td class=" d-flex justify-content-between">{{ product.product.name }}<a href="{% url 'stock:edit' %}?product_s={{ product.id }}">Editar</a></td>
+                    <td>{{ product.product.vendor.name }}</td>
+                    <td>{{ product.stock }}</td>
+                </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
+                <th>Vendedor</th>
+                <th>Stock</th>
             </tr>
         </tfoot>
     </table>
@@ -43,4 +37,21 @@
 <script>
     new DataTable('#productos');
 </script>
+{% if messages %}
+  <script>
+    {% for message in messages %}
+      {% if message.tags == 'success' %}
+        $.notify("{{ message|escapejs }}", "success");
+      {% elif message.tags == 'info' %}
+        $.notify("{{ message|escapejs }}", "info");
+      {% elif message.tags == 'warning' %}
+        $.notify("{{ message|escapejs }}", "warn");
+      {% elif message.tags == 'error' %}
+        $.notify("{{ message|escapejs }}", "error");
+      {% else %}
+        $.notify("{{ message|escapejs }}", "info");
+      {% endif %}
+    {% endfor %}
+  </script>
+{% endif %}
 {% endblock %}

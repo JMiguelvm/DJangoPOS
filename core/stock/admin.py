@@ -1,3 +1,6 @@
 from django.contrib import admin
 
-# Register your models here.
+from .models import ProductStock, StockItem
+
+admin.site.register(ProductStock)
+admin.site.register(StockItem)

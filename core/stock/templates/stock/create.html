@@ -10,32 +10,24 @@
         <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
             <thead>
                 <tr>
-                    <th>Name</th>
-                    <th>Position</th>
-                    <th>Office</th>
-                    <th>Age</th>
-                    <th>Start date</th>
-                    <th>Salary</th>
+                    <th>Nombre</th>
+                    <th>Vendedor</th>
                 </tr>
             </thead>
             <tbody>
+                
+                {% for product in products %}
                 <tr>
-                    <td class=" d-flex justify-content-between">Tiger Nixon<a href="{% url 'customers:edit' %}">Seleccionar</a></td>
-                    <td>System Architect</td>
-                    <td>Edinburgh</td>
-                    <td>61</td>
-                    <td>2011-04-25</td>
-                    <td>$320,800</td>
+                    <td class=" d-flex justify-content-between">{{ product.name }}<a href="{% url 'stock:create' %}?product={{ product.id }}">Seleccionar</a></td>
+                    <td>{{ product.vendor.name }}</td>
                 </tr>
+                {% endfor %}
+                    
             </tbody>
             <tfoot>
                 <tr>
-                    <th>Name</th>
-                    <th>Position</th>
-                    <th>Office</th>
-                    <th>Age</th>
-                    <th>Start date</th>
-                    <th>Salary</th>
+                    <th>Nombre</th>
+                    <th>Vendedor</th>
                 </tr>
             </tfoot>
         </table>
