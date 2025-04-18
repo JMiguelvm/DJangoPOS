@@ -1,8 +1,12 @@
-
+<style>
+    .dropdown-item:hover {
+        background-color: rgba(136, 136, 136, 0.22);
+    }
+</style>
 <!-- Barra superior -->
 <div class="border border-info flex-fill d-flex flex-column" style="min-height: 0;">
-    <div class="card-body p-0 pt-2 w-100" style="flex: 0 0 0;">
-        <ul class="nav nav-tabs">
+    <div class="card-body p-0 pt-2 w-100 d-flex nav-tabs" style="flex: 0 0 0;">
+        <ul class="nav flex-grow-1">
             <li class="nav-item">
                 <a class="nav-link active" href="/posView" id="actualOrder">Orden actual</a>
             </li>
@@ -10,6 +14,21 @@
                 <a class="nav-link" id="allOrders" href="/pos?page=1">Ordenes</a>
             </li>
         </ul>
+        <div class="dropstart p-1">
+            <div class="btn-group">
+                <button class="btn btn-outline-secondary" type="button" id="dropdbtn"><span class="fas fa-angle-left"></span></button>
+                <a class="btn btn-outline-danger" href="/"><span class="fas fa-xmark fs-5"></span></a>
+            </div>
+            <ul class="dropdown-menu" id="dropd" style="left: auto; right: 100%; top: 0;">
+              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><a class="dropdown-item" href="#">Another action</a></li>
+              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li><hr class="dropdown-divider"></li>
+              <li><a class="dropdown-item" href="#">Separated link</a></li>
+            </ul>
+            
+        </div>
+                
     </div>
     <div id="cart_product" class="overflow-auto" style="min-height: 0;">
         {% include 'pos/product_card.html' %}
@@ -80,3 +99,10 @@
         </button>
     </div>
 </div>
+<script>
+    $(document).ready(function() {
+        $('#dropdbtn').click(function() {
+            $('#dropd').toggle();
+        });
+    });
+</script>
