@@ -6,7 +6,7 @@ class ProductStock(models.Model):
     product = models.ForeignKey(Product, on_delete=models.CASCADE)
     stock = models.IntegerField(default=0)
     def __str__(self):
-        return f"{self.product.name} - {self.stock}"
+        return f"{self.product.name} - {self.product.id}- {self.stock}"
     def total_stock(self):
         return sum(item.quantity for item in self.stockitem_set.filter(voided=False))
 
