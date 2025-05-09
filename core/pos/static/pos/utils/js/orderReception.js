@@ -56,7 +56,44 @@ function createTable (name_fields, element, ajax = null, data = null) {
     return dt
 }
 
-function receiveProduct(id, name, amount, price) {
+function scanBarCode(content) {
+    const container = document.createElement('div');
+    container.style.marginBottom = '20px';
+    
+    let input = document.createElement('input');
+    input.type = 'text';
+    input.placeholder = 'Seleccione para ingresar código de barras.';
+    input.className = 'form-control mb-3';
+    
+    container.appendChild(input);
+    content.append(container);
+    setTimeout(() => input.focus(), 100);
+    $(input).on('keydown', function(event) {
+        if (event.keyCode === 13) {
+            let bar_code = $(input).val();
+            $.ajax({
+                type: "POST",
+                url: "/pos/get_product_by_barcode",
+                contentType: 'application/json',
+                data: JSON.stringify({barcode: bar_code}),
+                headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+                success: function (response) {
+                    if (response.status == 'success') {
+                        console.log("Respuesta: "+response.product)
+                        receiveProduct(response.product.id, response.product.name);
+                        $(input).val('')
+                    }
+                    else if (response.status == 'error') {
+                        showError(response.message);
+                    }
+                }
+                
+            });
+        }
+    });
+}
+
+function receiveProduct(id, name) {
     dialog = $.confirm({
         title: 'Recibir producto: '+name+'',
         content: `
@@ -65,18 +102,16 @@ function receiveProduct(id, name, amount, price) {
         `,
         buttons: {
             confirmar: function() {
-                let id = id;
-                let amount = amount;
-                let price = price;
                 let context = {
                     id: id,
-                    amount: amount,
-                    price: price
+                    amount: this.$content.find('input[name="amount"]').val(),
+                    price: this.$content.find('input[name="price"]').val()
                 };
+                console.log(context)
                 $.ajax({
                     type: "POST",
                     url: "/pos/add_stock",
-                    contentType: 'aplication/json',
+                    contentType: 'application/json',
                     data: JSON.stringify(context),
                     headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                     success: function (response) {
@@ -107,7 +142,7 @@ function productList(response) {
                 let product = dt.row(this).data();
                 console.log(product)
                 dialog_product.close()
-                receiveProduct(product[0], product[1], this.$content.find('input[name="amount"]').val(), this.$content.find('input[name="price"]').val());
+                receiveProduct(product[0], product[1]);
             });
         },
         buttons: {
@@ -122,14 +157,15 @@ $("#test").click(function () {
         title: 'Recibir un pedido',
         content: 'Seleccione el vendedor del producto que desea recibir:',
         onContentReady: function () {
-            dt = createTable (["id", "name", "numberPhone"], this.$content[0], '/pos/get_vendor')
+            scanBarCode(this.$content[0]);
+            dt = createTable (["id", "Nombre", "Número"], this.$content[0], '/pos/get_vendor')
             dt.on('click', 'tbody tr', function () { 
                 let data = dt.row(this).data();
                 let context = {id: dt.row(this).data()[0] /*ID form VENDOR ROW*/}
                 $.ajax({
                     type: "POST",
                     url: "/pos/get_products",
-                    contentType: 'aplication/json',
+                    contentType: 'application/json',
                     data: JSON.stringify(context),
                     headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                     success: function (response) {

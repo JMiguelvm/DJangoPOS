@@ -41,7 +41,7 @@ def create(request):
         category = Category.objects.get(id=request.POST['category'])
         vendor = Vendor.objects.get(id=request.POST['vendor'])
         description = request.POST['description']
-        bar_code = request.POST['bar_code']
+        bar_code = request.POST.get('bar_code')
         Product.objects.create(name=name, category=category, vendor=vendor, description=description, bar_code=bar_code)
         return redirect('products:index')
     return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})
