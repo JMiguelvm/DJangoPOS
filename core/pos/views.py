@@ -6,8 +6,7 @@ from stock.models import ProductStock, StockItem
 from django.core.exceptions import ObjectDoesNotExist
 import json
 def index(request):
-    products = ProductStock.objects.all()
-    return render(request, "pos/index.html", {"products": products})
+    return render(request, "pos/index.html")
 
 def get_vendor(request):
     vendor = list(Vendor.objects.values_list("id", "name", "numberPhone"))
@@ -72,4 +71,18 @@ def get_product_by_barcode(request):
                 'status': 'error',
                 'message': 'Producto no encontrado'
             })
-        
+
+def get_stock(request):
+    products_stock = ProductStock.objects.all()
+    if products_stock:
+        data = [[
+            [item.id, item.product.id],
+            item.product.name,
+            item.product.sell_price,
+            item.product.category.name,
+            item.stock
+        ]for item in products_stock]
+        print(data)
+        return JsonResponse({'status': 'success', 'data': data})
+    else:
+        return JsonResponse({'status': 'error'})
