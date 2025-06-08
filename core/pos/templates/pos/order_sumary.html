@@ -20,7 +20,7 @@
                 <a class="btn btn-outline-danger" href="/"><span class="fas fa-xmark fs-5"></span></a>
             </div>
             <ul class="dropdown-menu" id="dropd" style="left: auto; right: 100%; top: 0;">
-              <li><a class="dropdown-item" href="#">Action</a></li>
+              <li><button class="dropdown-item btn" id="recieve">Recibir pedido</button></li>
               <li><a class="dropdown-item" href="#">Another action</a></li>
               <li><a class="dropdown-item" href="#">Something else here</a></li>
               <li><hr class="dropdown-divider"></li>
@@ -31,8 +31,6 @@
                 
     </div>
     <div id="cart_product" class="overflow-auto" style="min-height: 0;">
-        {% include 'pos/product_card.html' %}
-        {% include 'pos/product_card.html' %}
     </div>
 </div>
 <!-- Barra inferior -->

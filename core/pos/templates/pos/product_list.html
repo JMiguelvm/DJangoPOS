@@ -8,48 +8,28 @@
     <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
         <thead>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Categoria</th>
+                <th>Inventario</th>
             </tr>
         </thead>
         <tbody>
+            {% for product in products %}
             <tr class="product_item">
-                <td>Andres</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>51</td>
-                <td>2011-04-25</td>
-                <td>$320,800</td>
+                <td>{{ product.product.name }}</td>
+                <td>{{ product.product.sell_price }}</td>
+                <td>{{ product.product.category }}</td>
+                <td>{{ product.stock }}</td>
             </tr>
-            <tr class="product_item">
-                <td>Scott</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>31</td>
-                <td>2011-04-25</td>
-                <td>$340,800</td>
-            </tr>
-            <tr class="product_item">
-                <td>Zero</td>
-                <td>System Architect</td>
-                <td>Edinburgh</td>
-                <td>61</td>
-                <td>2011-04-25</td>
-                <td>$320,800</td>
-            </tr>
+            {% endfor %}
         </tbody>
         <tfoot>
             <tr>
-                <th>Name</th>
-                <th>Position</th>
-                <th>Office</th>
-                <th>Age</th>
-                <th>Start date</th>
-                <th>Salary</th>
+                <th>Nombre</th>
+                <th>Precio</th>
+                <th>Categoria</th>
+                <th>Inventario</th>
             </tr>
         </tfoot>
     </table>

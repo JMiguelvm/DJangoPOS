@@ -1,7 +1,4 @@
-const btn = document.createElement("button");
-btn.id = "btne";
-btn.textContent = "hola";
-btn.classList = "btn btn-success";
+
 function showError(text) {
     $.confirm({
         title: 'Error',
@@ -79,7 +76,6 @@ function scanBarCode(content) {
                 headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                 success: function (response) {
                     if (response.status == 'success') {
-                        console.log("Respuesta: "+response.product)
                         receiveProduct(response.product.id, response.product.name);
                         $(input).val('')
                     }
@@ -107,7 +103,6 @@ function receiveProduct(id, name) {
                     amount: this.$content.find('input[name="amount"]').val(),
                     price: this.$content.find('input[name="price"]').val()
                 };
-                console.log(context)
                 $.ajax({
                     type: "POST",
                     url: "/pos/add_stock",
@@ -140,8 +135,7 @@ function productList(response) {
             dt.on('click', 'tbody tr', function () {
                 let data = dt.row(this).data();
                 let product = dt.row(this).data();
-                console.log(product)
-                dialog_product.close()
+                dialog_product.close();
                 receiveProduct(product[0], product[1]);
             });
         },
@@ -152,7 +146,8 @@ function productList(response) {
     });
 }
 
-$("#test").click(function () { 
+$(document).ready(function() {
+  $("#recieve").click(function () {
     dialog = $.confirm({
         title: 'Recibir un pedido',
         content: 'Seleccione el vendedor del producto que desea recibir:',
@@ -187,5 +182,7 @@ $("#test").click(function () {
         }
     });
 });
+});
+
 
 
