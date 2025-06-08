@@ -19,3 +19,5 @@
 /core/pos/migrations/__pycache__
 /venv
 .qodo
+/core/reports/__pycache__
+/core/reports/migrations

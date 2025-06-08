@@ -1,11 +1,13 @@
 from django.shortcuts import render
 from django.http import JsonResponse
 from .models import Product, Vendor
+from django.db.models import Subquery
 from stock.models import ProductStock, StockItem
 from django.core.exceptions import ObjectDoesNotExist
 import json
 def index(request):
-    return render(request, "pos/index.html")
+    products = ProductStock.objects.all()
+    return render(request, "pos/index.html", {"products": products})
 
 def get_vendor(request):
     vendor = list(Vendor.objects.values_list("id", "name", "numberPhone"))
@@ -35,8 +37,6 @@ def add_stock(request):
             price = data.get('price')
             amount = data.get('amount')
             new_stock = StockItem.objects.create(product_stock = product_stock, quantity = amount, buy_price = price)
-            print(new_stock)
-            print(data)
             if new_stock:
                 product_stock.stock = product_stock.total_stock()
                 product_stock.save()
