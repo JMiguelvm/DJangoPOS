@@ -21,7 +21,7 @@
             {% for product in products %}
             <tr>
                 <td class=" d-flex justify-content-between">{{product.name}}<a href="{% url 'products:edit' %}?id={{ product.id }}">Editar</a></td>
-                <td>{{product.price}}</td>
+                <td>{{product.sell_price}}</td>
                 <td>{{product.stock}}</td>
                 <td>{{product.category}}</td>
                 <td>{{product.vendor}}</td>

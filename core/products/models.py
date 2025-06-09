@@ -3,7 +3,6 @@ from vendors.models import Vendor
 from categorys.models import Category
 class Product(models.Model):
     name = models.CharField(max_length=128)
-    price = models.FloatField(default=0.0)
     sell_price = models.FloatField(default=0.0)
     stock = models.IntegerField(default=0)
     description = models.TextField(null=True, default=None)

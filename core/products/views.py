@@ -18,6 +18,7 @@ def edit(request):
     elif request.method == "POST" and request.POST['id']:
         product = Product.objects.get(id=request.POST['id'])
         product.name = request.POST['name']
+        product.sell_price = request.POST['price']
         product.category = Category.objects.get(id=request.POST['category'])
         product.vendor = Vendor.objects.get(id=request.POST['vendor'])
         product.description = request.POST['description']
@@ -39,9 +40,10 @@ def create(request):
     if request.method == "POST":
         name = request.POST['name']
         category = Category.objects.get(id=request.POST['category'])
+        sell_price = request.POST['price']
         vendor = Vendor.objects.get(id=request.POST['vendor'])
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
-        Product.objects.create(name=name, category=category, vendor=vendor, description=description, bar_code=bar_code)
+        Product.objects.create(name=name, category=category, sell_price=sell_price, vendor=vendor, description=description, bar_code=bar_code)
         return redirect('products:index')
     return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})
