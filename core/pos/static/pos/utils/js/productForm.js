@@ -36,6 +36,20 @@ function createTable (name_fields, element, ajax = null, data = null) {
     // Usuful to get data form dt
     return dt
 }
+
+function showError(text) {
+    $.confirm({
+        title: 'Error',
+        content: text,
+        type: 'red',
+        typeAnimated: true,
+        buttons: {
+            confirmar: function () {
+            }
+        }
+    });
+}
+
 function Product(id, name, sell_price, stock, p_stock_id) {
     // Propiedades
     this.id = id;
@@ -129,11 +143,17 @@ $(document).ready(function() {
                 product.quantity++;
                 product.updateUI();
             }
+            
         }
         else {
             let product = new Product(data[0][0], data[1], data[2], data[4], data[0][1]);
-            products.set(data[0][0], product);
-            product.render();
+            if (product.stock > 0) {
+                products.set(data[0][0], product);
+                product.render();
+            }
+            else {
+                showError("Este producto no tiene inventario.");
+            }
         }
     });
 });
