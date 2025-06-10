@@ -59,20 +59,23 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
     // Método para crear el elemento (sin insertarlo en el DOM)
     this.createElement = function() {
         const html = `
-            <div class="d-flex align-items-stretch border-secondary border-top border-bottom p-1 mb-2 mt-2" id="${this.t_product}">
-                <div class="flex-fill">
-                    <b class="m-1 fs-6">${this.name}</b>
-                    <div class="p-2" style="height: 50px;">
+            <div class="p-2 border-bottom" id="${this.t_product}">
+                <div class="card-header modal-header d-flex justify-content-between mb-2">
+                    <h5 class="modal-title">${this.name}</h5>
+                    <button type="button" class="btn-close productDelete" data-bs-dismiss="${this.id}" aria-label="Close"></button>
+                </div>
+                <div class="flex-fill d-flex justify-content-center align-items-center">
+                    <div style="width: 300px;">
                         <div class="input-group">
                             <button type="button" class="btn btn-outline-secondary p-subtract">-</button>
                             <input type="number" id="${this.t_quantity}" class="form-control" value="${this.quantity}" readonly>
                             <button type="button" class="btn btn-outline-secondary p-add">+</button>
                         </div>
                     </div>
-                </div>
-                <div style="width: 150px;">
-                    <div class="text-center h-100 align-content-center">
-                        <h4><span id="${this.t_total}" class="p_card_price `+(this.iva ? "":"noIVA")+`">${this.sell_price * this.quantity}</span></h4>
+                    <div style="width: 150px;">
+                        <div class="text-center align-content-center">
+                            <h4><span id="${this.t_total}" class="p_card_price `+(this.iva ? "":"noIVA")+`">${this.sell_price * this.quantity}</span></h4>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -97,12 +100,33 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
                 this.updateUI();
             }
         });
+        contextProduct = this;
+        $element.find('.productDelete').click((e) => {
+            e.preventDefault();
+            $.confirm({
+                title: 'Advertencia',
+                content: "¿Estás seguro de eliminar este producto de la orden de venta?",
+                type: 'red',
+                typeAnimated: true,
+                buttons: {
+                    confirmar: function () {
+                        contextProduct.delete();
+                    },
+                    cancelar: function () {
+                        
+                    }
+                }
+            });
+        });
 
         return $element;
     };
 
     // Método para actualizar la UI
     this.updateUI = function() {
+        if ($("#sTotal").text() == 0) {
+            $("#btnDraft").prop( "disabled", false );
+        }
         $(`#${this.t_quantity}`).val(this.quantity);
         $(`#${this.t_total}`).text((this.sell_price * this.quantity)); // .text() en lugar de .val()
         $(`#${this.t_total}`).priceFormat({
@@ -148,6 +172,12 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
             $(container).prepend(this.$element);
             this.updateUI(); // Actualiza valores iniciales
         }
+    };
+    // Método para eliminar el producto del resumen de venta
+    this.delete = function() {
+        $("#"+this.t_product).remove();
+        products.delete(this.id);
+        this.updateUI();
     };
 }
 
