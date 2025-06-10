@@ -2,6 +2,8 @@ from django.shortcuts import render, redirect
 from products.models import Product
 from vendors.models import Vendor
 from categorys.models import Category
+from stock.models import ProductStock, StockItem
+from datetime import datetime
 
 def index(request):
     products = Product.objects.all()
@@ -46,6 +48,21 @@ def create(request):
         vendor = Vendor.objects.get(id=request.POST['vendor'])
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
-        Product.objects.create(name=name, category=category, sell_price=sell_price, iva=iva, vendor=vendor, description=description, bar_code=bar_code)
+        product = Product.objects.create(name=name, category=category, sell_price=sell_price, iva=iva, vendor=vendor, description=description, bar_code=bar_code)
+        # If must had initial inventory
+        if request.POST.get('initial_inv'):
+            p_stock = ProductStock.objects.create(product=product)
+            datetime_str = request.POST.get('datetime')
+            if datetime_str:
+                try:
+                    dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
+                except ValueError:
+                    dt = datetime.now()
+            amount = request.POST['amount']
+            buy_price = request.POST['buy_price']
+            # Add stock
+            StockItem.objects.create(product_stock=p_stock, quantity=amount, date=dt, buy_price=buy_price)
+            p_stock.stock = p_stock.total_stock()
+            p_stock.save()
         return redirect('products:index')
     return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})

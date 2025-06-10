@@ -62,9 +62,21 @@
             <input name="bar_code" type="text" class="form-control" id="bar-code" placeholder="Código de barras" aria-label="Código de barras">
             <label class="btn btn-outline-secondary" for="bar-code">Editar</label>
         </div>
+        <!-- INVENTORY TO NEW PRODUCT -->
+        <div id="invDiv" style="display: none;">
+            <h6 class=" navbar-text m-0 p-0">Crear producto con inventario inicial:</h6>
+            <div class=" input-group mb-3 mt-3">
+                <input type="datetime-local" name="datetime" class="form-control" required>
+                <input type="number" min="0" name="amount" placeholder="Cantidad" class="form-control" required>
+                <input type="number" min="0" name="buy_price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
+            </div>
+        </div>
+        
         <!-- SUBMIT -->
         <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
             <a href="{% url 'products:index' %}" class="btn btn-outline-secondary">Cancelar</a>
+            <input type="checkbox" class="btn-check" name="initial_inv" id="btn-check-outlined" autocomplete="off">
+            <label class="btn btn-outline-primary" for="btn-check-outlined">¿Inventario inicial?</label>
             <button type="submit" class="btn btn-outline-success">Guardar</button>
         </div>
     </form>
@@ -78,7 +90,11 @@
                 $('#bar-code').prop("disabled", true)
             }
         });
+        $("#btn-check-outlined").click(function (e) {
+            $("#invDiv").toggle();
+        });
     });
+    
     
 </script>
 {% endblock %}
