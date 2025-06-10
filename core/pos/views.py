@@ -55,8 +55,12 @@ def get_product_by_barcode(request):
                 return JsonResponse({
                     'status': 'success',
                     'product': {
-                        'id': pstock.id,
-                        'name': product.name
+                        'id': product.id,
+                        'name': product.name,
+                        'price': product.sell_price,
+                        'stock': pstock.stock,
+                        'iva': product.iva,
+                        'stock_id': pstock.id
                     }
                 })
         

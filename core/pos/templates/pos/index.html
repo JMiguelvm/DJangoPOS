@@ -49,13 +49,6 @@
                     .addClass('dt-container border p-3 dataTables_wrapper');
             }
         });
-        $(document).ready(function() {
-            $('#bar-code').on('keydown', function(event) {
-                if (event.keyCode === 13) {
-                    $('#bar-code').prop("disabled", true)
-                }
-            });
-        });
     </script>
     {% if messages %}
     <script>

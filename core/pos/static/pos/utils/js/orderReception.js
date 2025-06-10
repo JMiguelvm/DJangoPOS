@@ -76,7 +76,7 @@ function scanBarCode(content) {
                 headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                 success: function (response) {
                     if (response.status == 'success') {
-                        receiveProduct(response.product.id, response.product.name);
+                        receiveProduct(response.product.stock_id, response.product.name);
                         $(input).val('')
                     }
                     else if (response.status == 'error') {

@@ -184,5 +184,36 @@ $(document).ready(function() {
     $('#btnBarCode').click(function() {
         $('#inputBarCode').toggle();
     });
+    function submitBarcode() {
+        let bar_code = $('#bar-code').val();
+        $.ajax({
+            type: "POST",
+            url: "/pos/get_product_by_barcode",
+            contentType: 'application/json',
+            data: JSON.stringify({barcode: bar_code}),
+            headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+            success: function (response) {
+                if (response.status == 'success') {
+                    verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id, response.product.iva);
+                    $('#bar-code').val('');
+                    setTimeout(() => $('#bar-code').focus(), 100);
+                }
+                else if (response.status == 'error') {
+                    showError(response.message);
+                }
+            }
+        });
+    }
+    $('#bar-code').on('keydown', function(event) {
+        if (event.keyCode === 13) {
+            submitBarcode();
+        }
+    });
+
+    $('#submitBC').on('click', function(e) {
+        e.preventDefault();
+        submitBarcode();
+    });
+
 });
 
