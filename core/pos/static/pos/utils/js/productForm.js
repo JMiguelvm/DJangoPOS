@@ -1,5 +1,8 @@
+// Diccionario en donde ira la id de el product stock, ligado a X instancia de product card
+var products = new Map();
+
 // Create a data table with name_fields array, element where dt must place and ajax to fill data
-function createTable (name_fields, element, ajax = null, data = null) {
+function pCreateTable (name_fields, element, ajax = null, data = null) {
     const table = document.createElement("table");
     table.classList = "display compact"
     table.style.width = "100%";
@@ -21,7 +24,8 @@ function createTable (name_fields, element, ajax = null, data = null) {
         searching: true,
         responsive: true,
         columnDefs: [
-            { visible: false, targets: 0 },
+            { targets: [0, 5], visible: false},
+            { targets: '_all', visible: true },
             { className: 'pointer', targets: "_all" }
         ]
     }
@@ -37,20 +41,7 @@ function createTable (name_fields, element, ajax = null, data = null) {
     return dt
 }
 
-function showError(text) {
-    $.confirm({
-        title: 'Error',
-        content: text,
-        type: 'red',
-        typeAnimated: true,
-        buttons: {
-            confirmar: function () {
-            }
-        }
-    });
-}
-
-function Product(id, name, sell_price, stock, p_stock_id) {
+function Product(id, name, sell_price, stock, p_stock_id, iva) {
     // Propiedades
     this.id = id;
     this.name = name;
@@ -58,6 +49,7 @@ function Product(id, name, sell_price, stock, p_stock_id) {
     this.quantity = 1; // Valor por defecto
     this.p_stock_id = p_stock_id;
     this.stock = stock;
+    this.iva = iva;
     
     // IDs dinámicos
     this.t_quantity = 'q' + this.id;
@@ -80,7 +72,7 @@ function Product(id, name, sell_price, stock, p_stock_id) {
                 </div>
                 <div style="width: 150px;">
                     <div class="text-center h-100 align-content-center">
-                        <h4>$ <span id="${this.t_total}">${this.sell_price * this.quantity}</span></h4>
+                        <h4><span id="${this.t_total}" class="p_card_price `+(this.iva ? "":"noIVA")+`">${this.sell_price * this.quantity}</span></h4>
                     </div>
                 </div>
             </div>
@@ -112,7 +104,41 @@ function Product(id, name, sell_price, stock, p_stock_id) {
     // Método para actualizar la UI
     this.updateUI = function() {
         $(`#${this.t_quantity}`).val(this.quantity);
-        $(`#${this.t_total}`).text(this.sell_price * this.quantity); // .text() en lugar de .val()
+        $(`#${this.t_total}`).text((this.sell_price * this.quantity)); // .text() en lugar de .val()
+        $(`#${this.t_total}`).priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
+        });
+        let subtotal = 0;
+        let iva = 0;
+        $(".p_card_price").each(function( key, value ) {
+            subtotal += parseInt($(".p_card_price").eq(key).unmask());
+            if(!($(".p_card_price").eq(key).hasClass('noIVA'))) {
+                iva += parseInt($(".p_card_price").eq(key).unmask());
+            }
+        });
+        iva = (iva/100)*19;
+        console.log(subtotal +"+ "+ iva)
+        let total = subtotal + iva;
+        $("#sSubtotal").text(subtotal);
+        $("#sSubtotal").priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
+        });
+        $("#sIva").text(iva);
+        $("#sIva").priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
+        });
+        $("#sTotal").text(total);
+        $("#sTotal").priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
+        });
     };
 
     // Método para renderizar en el DOM
@@ -125,36 +151,38 @@ function Product(id, name, sell_price, stock, p_stock_id) {
     };
 }
 
+function verifyProductInOrder(id, name, sell_price, stock, p_stock_id, iva) {
+    if (products.has(id)) {
+        let selectedProduct = products.get(id);
+        if ((selectedProduct.quantity > 0) && (selectedProduct.quantity+1 <= selectedProduct.stock)) {
+            selectedProduct.quantity++;
+            selectedProduct.updateUI();
+        }
+    }
+    else {
+        let selectedProduct = new Product(id, name, sell_price, stock, p_stock_id, iva);
+        if (selectedProduct.stock > 0) {
+            products.set(id, selectedProduct);
+            selectedProduct.render();
+        }
+        else {
+            showError("Este producto no tiene inventario.");
+        }
+    }
+}
+
 // Representación en UI de lista completa de productos
 $(document).ready(function() {
-
-    // Diccionario en donde ira la id de el product stock, ligado a X instancia de product card
-    var products = new Map();
-
-    dt = createTable(["id","Nombre", "Precio", "Categoria", "Inventario"], $("#product_list"), '/pos/get_stock');
+    productTable = pCreateTable(["id","Nombre", "Precio", "Categoria", "Inventario", "iva"], $("#product_list"), '/pos/get_stock');
     $("#product_list > .dt-container").css("width", "100%");
     $("#product_list > .dt-container").css("margin", "0");
     $("#product_list > .dt-container").attr("class", "dt-container border p-3 display table table-striped table-bordered table-hover dataTable");
-    dt.on('click', 'tbody tr', function () {
-        let data = dt.row(this).data();
-        if (products.get(data[0][0])) {
-            product = products.get(data[0][0]);
-            if ((product.quantity > 0) && (product.quantity+1 <= product.stock)) {
-                product.quantity++;
-                product.updateUI();
-            }
-            
-        }
-        else {
-            let product = new Product(data[0][0], data[1], data[2], data[4], data[0][1]);
-            if (product.stock > 0) {
-                products.set(data[0][0], product);
-                product.render();
-            }
-            else {
-                showError("Este producto no tiene inventario.");
-            }
-        }
+    productTable.on('click', 'tbody tr', function () {
+        let data = productTable.row(this).data();
+        verifyProductInOrder(data[0][0], data[1], data[2], data[4], data[0][1], data[5]);
+    });
+    $('#btnBarCode').click(function() {
+        $('#inputBarCode').toggle();
     });
 });
 

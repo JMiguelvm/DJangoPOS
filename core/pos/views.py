@@ -21,7 +21,7 @@ def get_products(request):
             data = [[
                 item.id,
                 item.product.name,
-                item.product.price,
+                item.product.sell_price,
                 item.stock
             ]for item in products_stock]
             return JsonResponse({'status': 'success', 'data': data})
@@ -80,7 +80,8 @@ def get_stock(request):
             item.product.name,
             item.product.sell_price,
             item.product.category.name,
-            item.stock
+            item.stock,
+            item.product.iva
         ]for item in products_stock]
         print(data)
         return JsonResponse({'status': 'success', 'data': data})
