@@ -35,66 +35,74 @@
 </div>
 <!-- Barra inferior -->
 <div class="p-2 border-info border" style="height: 300px;">
-    <!-- Resumen de orden -->
-    <div class="summary" style="height: 100px;">
-        <p class="fw-normal">
-            <b>SUBTOTAL: </b>
-            <span id="sSubtotal">
-                5000
-            </span><br>
-            <b>IVA: </b>
-            <span id="sIva">
-                5000
-            </span><br>
-            <span class="fs-4">
-                <b>TOTAL: </b>
+    <!-- Barra inferior - superior -->
+    <div style="height: 70%;">
+        <!-- Resumen de orden -->
+        <div class="summary" style="height: 100px;">
+            <p class="fw-normal">
+                <b>SUBTOTAL: </b>
+                <span id="sSubtotal">
+                    0
+                </span><br>
+                <b>IVA: </b>
                 <span id="sIva">
-                    5000
+                    0
+                </span><br>
+                <span class="fs-4">
+                <b>TOTAL: </b>
+                <span id="sTotal">
+                    0
                 </span>
-            </span>
-        </p>
+                </span>
+            </p>
+        </div>
+        <!-- Seleccion cliente -->
+        <div class="input-group mb-3 d-none">
+            <select class="form-select">
+                <option selected>Seleccione un cliente:</option>
+                <option value="1">Cliente</option>
+            </select>
+            <button class="btn btn-outline-secondary" type="button">Aceptar</button>
+        </div>
+        <!-- Código de barras -->
+        <div class="input-group mb-3" id="inputBarCode" style="display: none;">
+            <span class="input-group-text"><span class="fas fa-barcode"></span></span>
+            <input type="text" class="form-control" id="bar-code" placeholder="Código de barras" aria-label="Código de barras">
+            <label class="btn btn-outline-secondary" for="bar-code">Agregar</label>
+        </div>
+        <!-- Guardar en borrador -->
+        <button class="btn btn-outline-primary w-100" type="button" disabled>Guardar en borrador</button>
     </div>
-    <!-- Seleccion cliente -->
-    <div class="input-group mb-3 d-none">
-        <select class="form-select">
-            <option selected>Seleccione un cliente:</option>
-            <option value="1">Cliente</option>
-        </select>
-        <button class="btn btn-outline-secondary" type="button">Aceptar</button>
-    </div>
-    <!-- Código de barras -->
-    <div class="input-group mb-3">
-        <span class="input-group-text"><span class="fas fa-barcode"></span></span>
-        <input type="text" class="form-control" id="bar-code" placeholder="Código de barras" aria-label="Código de barras">
-        <label class="btn btn-outline-secondary" for="bar-code">Agregar</label>
-    </div>
-    <!-- Botones de orden -->
-    <button class="btn btn-outline-primary w-100" type="button" disabled>Guardar en borrador</button>
-    <div class="d-flex flex-row">
-        <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
-            <i class="fas fa-coins fs-4"></i>
-            <span class="d-block">
-                Cal. Vueltas
-            </span>
-        </button>
-        <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
-            <i class="fas fa-user-pen d-block fs-4"></i>
-            <span class="d-block">
-                Fiar a cliente
-            </span>
-        </button>
-        <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
-            <i class="fas fa-barcode d-block fs-4"></i>
-            <span class="d-block">
-                Ingresar cód.
-            </span>
-        </button>
-        <button type="button" class="btn btn-success square-button fs-6 m-1" style="height: 80px; width: 100%;" disabled>
-            <i class="fas fa-cash-register d-block fs-4"></i>
-            <span class="d-block">
-                Realizar orden
-            </span>
-        </button>
+    <!-- Barra inferior - inferior -->
+    <div class="border-top" style="height: 30%;">
+        <!-- Botones de orden -->
+        <div class="d-flex flex-row">
+            <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
+                <i class="fas fa-coins fs-4"></i>
+                <span class="d-block">
+                    Cal. Vueltas
+                </span>
+            </button>
+            <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
+                <i class="fas fa-user-pen d-block fs-4"></i>
+                <span class="d-block">
+                    Fiar a cliente
+                </span>
+            </button>
+            <input type="checkbox" class="btn-check" id="btnBarCode" autocomplete="off">
+            <label class="btn btn-outline-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;" for="btnBarCode">
+                <i class="fas fa-barcode d-block fs-4"></i>
+                <span class="d-block">
+                    Ingresar cód.
+                </span>
+            </label>
+            <button type="button" class="btn btn-success square-button fs-6 m-1" style="height: 80px; width: 100%;" disabled>
+                <i class="fas fa-cash-register d-block fs-4"></i>
+                <span class="d-block">
+                    Realizar orden
+                </span>
+            </button>
+        </div>
     </div>
 </div>
 <script>
