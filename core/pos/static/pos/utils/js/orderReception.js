@@ -1,5 +1,5 @@
 
-function showError(text) {
+function showError(text, focus = null) {
     $.confirm({
         title: 'Error',
         content: text,
@@ -7,6 +7,10 @@ function showError(text) {
         typeAnimated: true,
         buttons: {
             confirmar: function () {
+                if (focus) {
+                    $(focus).focus();
+                    $(focus).val('');
+                }
             }
         }
     });
@@ -76,26 +80,32 @@ function scanBarCode(content) {
                 headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                 success: function (response) {
                     if (response.status == 'success') {
-                        receiveProduct(response.product.stock_id, response.product.name);
+                        receiveProduct(response.product.stock_id, response.product.name, input);
                         $(input).val('')
                     }
                     else if (response.status == 'error') {
-                        showError(response.message);
+                        showError(response.message, input);
                     }
                 }
                 
             });
+            input.focus();
         }
     });
 }
 
-function receiveProduct(id, name) {
+function receiveProduct(id, name, input=null) {
     dialog = $.confirm({
         title: 'Recibir producto: '+name+'',
         content: `
         <input type="number" min="0" name="amount" placeholder="Cantidad" class="form-control" required>
         <input type="number" min="0" name="price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
         `,
+        onClose: function () {
+            if (input) {
+                $(input).focus();
+            }
+        },
         buttons: {
             confirmar: function() {
                 let context = {
@@ -111,7 +121,17 @@ function receiveProduct(id, name) {
                     headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                     success: function (response) {
                         if (response.status == 'success') {
-                            $.alert("Inventario añadido con éxito.");
+                            $.alert({
+                                title: 'Aviso',
+                                content: 'Inventario añadido con éxito.',
+                                onClose: function () {
+                                    if (input) {
+                                        $(input).focus();
+                                        $(input).val('');
+                                    }
+                                }
+                            });
+                            productTable.ajax.reload();
                         }
                         else {
                             showError("No fue posible añadir el inventario.");
@@ -121,6 +141,9 @@ function receiveProduct(id, name) {
                 });
             },
             cancelar: function () {
+                if (input) {
+                    $(input).focus();
+                }
             }
         }
     });
