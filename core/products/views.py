@@ -19,6 +19,7 @@ def edit(request):
         product = Product.objects.get(id=request.POST['id'])
         product.name = request.POST['name']
         product.sell_price = request.POST['price']
+        product.iva = True if request.POST.get("iva") else False
         product.category = Category.objects.get(id=request.POST['category'])
         product.vendor = Vendor.objects.get(id=request.POST['vendor'])
         product.description = request.POST['description']
@@ -41,9 +42,10 @@ def create(request):
         name = request.POST['name']
         category = Category.objects.get(id=request.POST['category'])
         sell_price = request.POST['price']
+        iva = True if request.POST.get("iva") else False
         vendor = Vendor.objects.get(id=request.POST['vendor'])
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
-        Product.objects.create(name=name, category=category, sell_price=sell_price, vendor=vendor, description=description, bar_code=bar_code)
+        Product.objects.create(name=name, category=category, sell_price=sell_price, iva=iva, vendor=vendor, description=description, bar_code=bar_code)
         return redirect('products:index')
     return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})
