@@ -8,10 +8,10 @@
     <div class="card-body p-0 pt-2 w-100 d-flex nav-tabs" style="flex: 0 0 0;">
         <ul class="nav flex-grow-1">
             <li class="nav-item">
-                <a class="nav-link active" href="/posView" id="actualOrder">Orden actual</a>
+                <button class="nav-link active" href="/posView" id="actualOrder">Orden actual</button>
             </li>
             <li class="nav-item">
-                <a class="nav-link" id="allOrders" href="/pos?page=1">Ordenes</a>
+                <button class="nav-link" id="allOrders" href="/pos?page=1">Ordenes</button>
             </li>
         </ul>
         <div class="dropstart p-1">
@@ -27,10 +27,12 @@
               <li><a class="dropdown-item" href="#">Separated link</a></li>
             </ul>
             
-        </div>
-                
+        </div>    
     </div>
     <div id="cart_product" class="overflow-auto" style="min-height: 0;">
+    </div>
+    <div id="order_list" class="overflow-auto" style="min-height: 0; display: none;">
+        <table id="ordersTable" class="display table-secondary w-" style="width:100%"></table>
     </div>
 </div>
 <!-- Barra inferior -->
@@ -96,7 +98,7 @@
                     Ingresar cód.
                 </span>
             </label>
-            <button type="button" class="btn btn-success square-button fs-6 m-1" style="height: 80px; width: 100%;" disabled>
+            <button type="button" class="btn btn-success square-button fs-6 m-1" id="makeOrder" style="height: 80px; width: 100%;" disabled>
                 <i class="fas fa-cash-register d-block fs-4"></i>
                 <span class="d-block">
                     Realizar orden
@@ -109,6 +111,173 @@
     $(document).ready(function() {
         $('#dropdbtn').click(function() {
             $('#dropd').toggle();
+        });
+        $('#actualOrder').click(function() {
+            if ($('#allOrders').hasClass("active")) {
+                $('#allOrders').removeClass("active");
+                $('#actualOrder').addClass("active");
+                $('#cart_product').toggle();
+                $('#order_list').toggle();
+            }
+        });
+        $('#allOrders').click(function() {
+            if ($('#actualOrder').hasClass("active")) {
+                $('#actualOrder').removeClass("active");
+                $('#allOrders').addClass("active");
+                $('#cart_product').toggle();
+                $('#order_list').toggle();
+            }
+        });
+
+        function renderOrder(id) {
+            $.ajax({
+                type: "POST",
+                url: "/pos/get_specific_order",
+                contentType: 'application/json',
+                data: JSON.stringify({"id": id}),
+                headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+                success: function (response) {
+                    let items = ``;
+                    let i = 1;
+                    let iva = 0;
+                    let total = 0;
+                    response.items.forEach(item => {
+                        items += `
+                        <tr>
+                            <td>${i}</td>
+                            <td><strong>${item.order_item.product_name}</strong></td>
+                            <td class="text-center">${item.order_item.quantity}</td>
+                            <td class="text-center order_sumary_price">${parseInt(item.order_item.sell_price)}</td>
+                            <td class="text-right order_sumary_price">${parseInt(item.order_item.total)}</td>
+                        </tr>
+                        `;
+                        if (item.order_item.iva) {
+                            iva += (parseInt(item.order_item.total)/100)*19;
+                        }
+                        total += parseInt(item.order_item.total);
+                        i++;
+                    });
+                    let status = "";
+                    switch (response.order.status) {
+                        case 1: status = 'Borrador';
+                        break;
+                        case 2: status = 'Publicada';
+                        break;
+                        case 3: status = 'Anulada';
+                        break;
+                        default: status = 'Desconocido';
+                    }
+                    let html = `
+                        <div class="container">
+                        <!-- BEGIN INVOICE -->
+                        <div class="invoice grid">
+                            <div class="grid-body">
+                            <div class="invoice-title">
+                                <h2>Orden de venta<br><span class="small">#${response.order.id}</span></h2>
+                            </div>
+                            <hr>
+                            <div class="d-flex justify-content-between">
+                                <address class="text-right">
+                                <strong>Fecha de orden:</strong><br>
+                                ${response.order.date}
+                                </address>
+                                <address class="text-right">
+                                <strong>Estado:</strong><br>
+                                ${status}
+                                </address>
+                            </div>
+                            <table class="table table-striped mt-3">
+                                <thead>
+                                <tr class="line">
+                                    <td><strong>#</strong></td>
+                                    <td class="text-center"><strong>PRODUCTO</strong></td>
+                                    <td class="text-center"><strong>CANTIDAD</strong></td>
+                                    <td class="text-right"><strong>(C/U)</strong></td>
+                                    <td class="text-right"><strong>SUBTOTAL</strong></td>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                ${items}
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td class="text-right"><strong>IVA</strong></td>
+                                    <td class="text-right"><strong class="order_sumary_price">${iva}</strong></td>
+                                </tr>
+                                <tr>
+                                    <td colspan="3"></td>
+                                    <td class="text-right"><strong>Total</strong></td>
+                                    <td class="text-right"><strong class="order_sumary_price">${total}</strong></td>
+                                </tr>
+                                </tbody>
+                            </table>
+                            </div>
+                        </div>
+                        <!-- END INVOICE -->
+                        </div>
+                        `;
+                    $.confirm({
+                        backgroundDismiss: true,
+                        columnClass: 'col-md-10',
+                        title: false,
+                        content: html,
+                        onOpenBefore: function () {
+                            $('.order_sumary_price').priceFormat({
+                                allowNegative: true,
+                                centsLimit: 0,
+                                prefix: '$'
+                            });
+                        },
+                        buttons: {
+                            confirmar: function() {
+
+                            }
+                        }
+                    });
+                }
+            });
+            
+        }
+
+        const order_list = $('#ordersTable').DataTable({
+            ajax: {
+                url: '/pos/get_orders',
+                dataSrc: 'data'
+            },
+            columns: [
+                { data: 'id', title: '# Orden' },
+                { data: 'date', title: 'Fecha' },
+                {
+                    data: 'status',
+                    title: 'Estado',
+                    render: function(data, type, row) {
+                        switch (data) {
+                            case 1: return 'Borrador';
+                            case 2: return 'Publicada';
+                            case 3: return 'Anulada';
+                            default: return 'Desconocido';
+                        }
+                    }
+                }
+            ],
+            rowCallback: function(row, data) {
+                if (data.status == 1) {
+                    $(row).addClass("table-warning");
+                } else if (data.status == 2) {
+                    $(row).addClass("table-success");
+                } else if (data.status == 3) {
+                    $(row).addClass("table-secondary");
+                }
+            },
+            lengthChange: false,
+            info: false,
+            responsive: true,
+            columnDefs: [
+                { className: 'pointer', targets: "_all" }
+            ]
+        });
+        order_list.on('click', 'tbody tr', function () {
+            let data = order_list.row(this).data();
+            renderOrder(data.id);
         });
     });
 </script>

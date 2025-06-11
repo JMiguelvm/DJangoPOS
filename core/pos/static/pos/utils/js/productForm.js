@@ -126,6 +126,7 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
     this.updateUI = function() {
         if ($("#sTotal").text() == 0) {
             $("#btnDraft").prop( "disabled", false );
+            $("#makeOrder").prop( "disabled", false );
         }
         $(`#${this.t_quantity}`).val(this.quantity);
         $(`#${this.t_total}`).text((this.sell_price * this.quantity)); // .text() en lugar de .val()
@@ -143,7 +144,6 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
             }
         });
         iva = (iva/100)*19;
-        console.log(subtotal +"+ "+ iva)
         let total = subtotal + iva;
         $("#sSubtotal").text(subtotal);
         $("#sSubtotal").priceFormat({
@@ -178,6 +178,10 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
         $("#"+this.t_product).remove();
         products.delete(this.id);
         this.updateUI();
+        if ($("#sTotal").unmask() == 0) {
+            $("#btnDraft").prop( "disabled", true );
+            $("#makeOrder").prop( "disabled", true );
+        }
     };
 }
 

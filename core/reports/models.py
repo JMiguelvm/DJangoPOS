@@ -16,7 +16,7 @@ class SaleReport(models.Model):
     total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
     net_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     def __str__(self):
-        return f"{self.date.date()} /-/ {self.total_income} /-/ {self.options[self.type - 1]}"
+        return f"ID:{self.id} /-/ {self.total_income} /-/ {self.options[self.type - 1]}"
     
 class SaleOrder(models.Model):
     options = [
@@ -27,9 +27,8 @@ class SaleOrder(models.Model):
     date = models.DateTimeField(default=timezone.now)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, default=None)
     status = models.IntegerField(choices=options, default=1)
-    registered = models.BooleanField(default=False)
     def __str__(self):
-        return f"{self.date} /-/ {self.options[self.status-1][1]}"
+        return f"ID:{self.id}  /-/ {self.options[self.status-1][1]}"
 
 class OrderItem(models.Model):
     order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE)

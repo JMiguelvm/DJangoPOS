@@ -3,6 +3,7 @@ from django.http import JsonResponse
 from .models import Product, Vendor
 from django.db.models import Subquery
 from stock.models import ProductStock, StockItem
+from reports.models import SaleOrder, OrderItem
 from django.core.exceptions import ObjectDoesNotExist
 import json
 def index(request):
@@ -87,7 +88,43 @@ def get_stock(request):
             item.stock,
             item.product.iva
         ]for item in products_stock]
-        print(data)
         return JsonResponse({'status': 'success', 'data': data})
     else:
         return JsonResponse({'status': 'error'})
+
+def get_orders(request):
+    orders = SaleOrder.objects.all()
+    data = [{
+        'id': order.id,
+        'date': order.date.strftime('%Y-%m-%d %H:%M:%S'),
+        'status': order.status
+    }for order in orders]
+    print(data)
+    return JsonResponse({'status': 'success', 'data': data})
+
+def get_specific_order(request):
+    data = json.loads(request.body)
+    order = SaleOrder.objects.filter(id=data['id']).first()
+    order_items = OrderItem.objects.filter(order=order)
+    data = {
+        'order': {
+            'id': order.id,
+            'date': order.date.strftime('%#d de %B de %Y a las %H:%M').capitalize(),
+            'status': order.status
+        },
+        'items': [
+            {
+                'order_item': {
+                    'product_name': item.product.name,
+                    'quantity': item.quantity,
+                    'sell_price': item.sell_price,
+                    'total': item.quantity*item.sell_price,
+                    'iva': item.iva
+                }
+            }
+            for item in order_items
+        ]
+    }
+    print("---------------------------------")
+    print(data)
+    return JsonResponse(data)
