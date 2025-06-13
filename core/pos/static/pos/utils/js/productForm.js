@@ -55,6 +55,7 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
     this.t_quantity = 'q' + this.id;
     this.t_total = 't' + this.id;
     this.t_product = 'p' + this.id;
+    this.t_delete = 'd' + this.id;
 
     // Método para crear el elemento (sin insertarlo en el DOM)
     this.createElement = function() {
@@ -62,7 +63,7 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
             <div class="p-2 border-bottom" id="${this.t_product}">
                 <div class="card-header modal-header d-flex justify-content-between mb-2">
                     <h5 class="modal-title">${this.name}</h5>
-                    <button type="button" class="btn-close productDelete" data-bs-dismiss="${this.id}" aria-label="Close"></button>
+                    <button type="button" class="btn-close" id="${this.t_delete}" aria-label="Close"></button>
                 </div>
                 <div class="flex-fill d-flex justify-content-center align-items-center">
                     <div style="width: 300px;">
@@ -100,8 +101,8 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
                 this.updateUI();
             }
         });
-        contextProduct = this;
-        $element.find('.productDelete').click((e) => {
+        $element.find('#'+this.t_delete).click((e) => {
+            let product = this;
             e.preventDefault();
             $.confirm({
                 title: 'Advertencia',
@@ -110,7 +111,7 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
                 typeAnimated: true,
                 buttons: {
                     confirmar: function () {
-                        contextProduct.delete();
+                        product.delete();
                     },
                     cancelar: function () {
                         
