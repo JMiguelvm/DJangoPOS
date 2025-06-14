@@ -12,4 +12,5 @@ urlpatterns = [
     path('add_stock', views.add_stock, name='add_stock'),
     path('get_orders', views.get_orders, name='get_orders'),
     path('get_specific_order', views.get_specific_order, name='get_specific_order'),
+    path('make_order', views.make_order, name='make_order')
 ]

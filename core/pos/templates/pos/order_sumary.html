@@ -157,6 +157,7 @@
                         total += parseInt(item.order_item.total);
                         i++;
                     });
+                    total += iva;
                     let status = "";
                     switch (response.order.status) {
                         case 1: status = 'Borrador';

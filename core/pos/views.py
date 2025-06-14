@@ -5,6 +5,8 @@ from django.db.models import Subquery
 from stock.models import ProductStock, StockItem
 from reports.models import SaleOrder, OrderItem
 from django.core.exceptions import ObjectDoesNotExist
+from django.db import transaction
+from collections import defaultdict
 import json
 def index(request):
     return render(request, "pos/index.html")
@@ -91,6 +93,77 @@ def get_stock(request):
         return JsonResponse({'status': 'success', 'data': data})
     else:
         return JsonResponse({'status': 'error'})
+    
+
+@transaction.atomic
+def make_order(request):
+    try:
+        data = json.loads(request.body)
+        order = SaleOrder.objects.create(status=data[0])
+        
+        for data_product in data[1]:
+            p_stock = ProductStock.objects.filter(id=data_product['stock_id']).first()
+            product = Product.objects.filter(id=p_stock.product.id).first()
+            entries = StockItem.objects.filter(
+                product_stock=p_stock, is_depleted=False
+            ).order_by("date")
+            
+            quantity_to_sell = data_product['quantity']
+            
+            for entrie in entries:
+                quantity_remaining = entrie.quantity - entrie.quantity_used
+                if quantity_to_sell <= quantity_remaining:
+                    entrie.quantity_used += quantity_to_sell
+                    if entrie.quantity == entrie.quantity_used:
+                        entrie.is_depleted = True
+                    entrie.save()
+                    
+                    StockItem.objects.create(
+                        product_stock=p_stock,
+                        quantity=quantity_to_sell * -1,
+                        buy_price=entrie.buy_price,
+                        is_depleted=True
+                    )
+                    
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        iva=data_product['iva'],
+                        quantity=quantity_to_sell,
+                        sell_price=data_product['sell_price'],
+                        buy_price=entrie.buy_price
+                    )
+                    break
+                else:
+                    entrie.quantity_used += quantity_remaining
+                    if entrie.quantity == entrie.quantity_used:
+                        entrie.is_depleted = True
+                    quantity_to_sell -= quantity_remaining
+                    entrie.save()
+                    
+                    StockItem.objects.create(
+                        product_stock=p_stock,
+                        quantity=quantity_remaining * -1,
+                        buy_price=entrie.buy_price,
+                        is_depleted=True
+                    )
+                    
+                    OrderItem.objects.create(
+                        order=order,
+                        product=product,
+                        iva=data_product['iva'],
+                        quantity=quantity_remaining,
+                        sell_price=data_product['sell_price'],
+                        buy_price=entrie.buy_price
+                    )
+                    
+                    if quantity_to_sell == 0:
+                        break
+            p_stock.stock = p_stock.total_stock()
+            p_stock.save()
+        return JsonResponse({'status': 'success'})
+    except Exception as e:
+        return JsonResponse({'status': 'error', 'message': str(e)})
 
 def get_orders(request):
     orders = SaleOrder.objects.all()
@@ -99,13 +172,28 @@ def get_orders(request):
         'date': order.date.strftime('%Y-%m-%d %H:%M:%S'),
         'status': order.status
     }for order in orders]
-    print(data)
     return JsonResponse({'status': 'success', 'data': data})
 
 def get_specific_order(request):
     data = json.loads(request.body)
     order = SaleOrder.objects.filter(id=data['id']).first()
     order_items = OrderItem.objects.filter(order=order)
+    items = defaultdict(lambda: {
+        'product_name': '',
+        'quantity': 0,
+        'sell_price': 0,
+        'total': 0,
+        'iva': 0,
+    })
+    for item in order_items:
+        key = item.product.id
+        items[key]['product_name'] = item.product.name
+        items[key]['quantity'] += item.quantity
+        items[key]['sell_price'] = item.sell_price
+        items[key]['total'] += item.quantity*item.sell_price
+        items[key]['iva'] = item.iva
+        
+
     data = {
         'order': {
             'id': order.id,
@@ -113,18 +201,7 @@ def get_specific_order(request):
             'status': order.status
         },
         'items': [
-            {
-                'order_item': {
-                    'product_name': item.product.name,
-                    'quantity': item.quantity,
-                    'sell_price': item.sell_price,
-                    'total': item.quantity*item.sell_price,
-                    'iva': item.iva
-                }
-            }
-            for item in order_items
+            {'order_item': item}for item in items.values()
         ]
     }
-    print("---------------------------------")
-    print(data)
     return JsonResponse(data)

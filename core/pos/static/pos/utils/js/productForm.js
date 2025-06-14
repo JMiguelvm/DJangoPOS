@@ -125,7 +125,7 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
 
     // Método para actualizar la UI
     this.updateUI = function() {
-        if ($("#sTotal").text() == 0) {
+        if ($("#sTotal").text() == 0 || $("#sTotal").text() == "$0") {
             $("#btnDraft").prop( "disabled", false );
             $("#makeOrder").prop( "disabled", false );
         }
@@ -186,6 +186,19 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
     };
 }
 
+function clearProducts() {
+    $("#sSubtotal").text('$0');
+    $("#sIva").text('$0');
+    $("#sTotal").text('$0');
+    $("#btnDraft").prop("disabled", true);
+    $("#makeOrder").prop("disabled", true);
+
+    products.forEach(product => {
+        product.delete();
+    });
+    products.clear();
+}
+
 function verifyProductInOrder(id, name, sell_price, stock, p_stock_id, iva) {
     if (products.has(id)) {
         let selectedProduct = products.get(id);
@@ -199,12 +212,57 @@ function verifyProductInOrder(id, name, sell_price, stock, p_stock_id, iva) {
         if (selectedProduct.stock > 0) {
             products.set(id, selectedProduct);
             selectedProduct.render();
+            $(products).each(function( key, value ) {
+                console.log(key)
+                console.log(value)
+            });
         }
         else {
             showError("Este producto no tiene inventario.");
         }
     }
 }
+
+function makeOrder(type) {
+    if (products.size > 0) {
+        let data = [type, []];
+        products.forEach((value, key) => {
+            data[1].push({
+                "stock_id": key,
+                "quantity": value.quantity,
+                "sell_price": value.sell_price,
+                "iva": value.iva
+            });
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/pos/make_order",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            headers: { 'X-CSRFTOKEN': CSRF_TOKEN },
+            success: function (response) {
+                if (response.status === 'success') {
+                    $.notify("Venta realizada con éxito.", "success");
+                    clearProducts();
+                } else {
+                    $.notify(response.message || "Ocurrió un error desconocido.", "error");
+                }
+            },
+            error: function (xhr) {
+                let message = "Error del servidor.";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                $.notify(message, "error");
+            }
+        });
+
+    } else {
+        $.notify("Debe haber productos en la orden de venta.", "warn");
+    }
+}
+
 
 // Representación en UI de lista completa de productos
 $(document).ready(function() {
@@ -248,6 +306,9 @@ $(document).ready(function() {
     $('#submitBC').on('click', function(e) {
         e.preventDefault();
         submitBarcode();
+    });
+    $('#makeOrder').on('click', function(e) {
+        makeOrder(2);
     });
 
 });
