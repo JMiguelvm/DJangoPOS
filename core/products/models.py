@@ -7,8 +7,8 @@ class Product(models.Model):
     stock = models.IntegerField(default=0)
     iva = models.BooleanField(default=True)
     description = models.TextField(null=True, default=None)
-    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True)
-    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True)
+    vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, default=None)
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, default=None)
     bar_code = models.CharField(max_length=20, default=0)
 
     def __str__(self):

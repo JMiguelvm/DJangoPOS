@@ -42,10 +42,10 @@ def create(request):
     categorys = Category.objects.all()
     if request.method == "POST":
         name = request.POST['name']
-        category = Category.objects.get(id=request.POST['category'])
+        category = Category.objects.get(id=request.POST['category']) if request.POST.get("category") else None
         sell_price = request.POST['price']
         iva = True if request.POST.get("iva") else False
-        vendor = Vendor.objects.get(id=request.POST['vendor'])
+        vendor = Vendor.objects.get(id=request.POST['vendor']) if request.POST.get("vendor") else None
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
         product = Product.objects.create(name=name, category=category, sell_price=sell_price, iva=iva, vendor=vendor, description=description, bar_code=bar_code)

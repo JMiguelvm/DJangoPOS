@@ -32,8 +32,8 @@
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Categoria:</h6>
             <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-list"></span></label>
-            <select name="category" class="form-select" id="inputGroupSelect01" required>
-                <option selected>Seleccione...</option>
+            <select name="category" class="form-select" id="inputGroupSelect01">
+                <option selected disabled value="">Seleccione...</option>
                 {% for category in categorys %}
                 <option value="{{category.id}}">{{category.name}}</option>
                 {% endfor %}
@@ -43,8 +43,8 @@
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Vendedor:</h6>
             <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-truck-ramp-box"></span></label>
-            <select name="vendor" class="form-select" id="inputGroupSelect01" required>
-                <option selected>Seleccione...</option>
+            <select name="vendor" class="form-select" id="inputGroupSelect01">
+                <option selected disabled value="">Seleccione...</option>
                 {% for vendor in vendors %}
                 <option value="{{vendor.id}}">{{vendor.name}}</option>
                 {% endfor %}
