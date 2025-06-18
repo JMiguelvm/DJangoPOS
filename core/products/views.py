@@ -40,29 +40,51 @@ def edit(request):
 def create(request):
     vendors = Vendor.objects.all()
     categorys = Category.objects.all()
+    
     if request.method == "POST":
         name = request.POST['name']
-        category = Category.objects.get(id=request.POST['category']) if request.POST.get("category") else None
+        
+        category_id = request.POST.get("category")
+        category = Category.objects.get(id=category_id) if category_id and category_id.isdigit() else None
+        
+        vendor_id = request.POST.get("vendor")
+        vendor = Vendor.objects.get(id=vendor_id) if vendor_id and vendor_id.isdigit() else None
+
         sell_price = request.POST['price']
         iva = True if request.POST.get("iva") else False
-        vendor = Vendor.objects.get(id=request.POST['vendor']) if request.POST.get("vendor") else None
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
-        product = Product.objects.create(name=name, category=category, sell_price=sell_price, iva=iva, vendor=vendor, description=description, bar_code=bar_code)
-        # If must had initial inventory
+        
+        product = Product.objects.create(
+            name=name,
+            category=category,
+            sell_price=sell_price,
+            iva=iva,
+            vendor=vendor,
+            description=description,
+            bar_code=bar_code
+        )
+        
+        # Inventario inicial
         if request.POST.get('initial_inv'):
             p_stock = ProductStock.objects.create(product=product)
             datetime_str = request.POST.get('datetime')
-            if datetime_str:
-                try:
-                    dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
-                except ValueError:
-                    dt = datetime.now()
+            try:
+                dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M') if datetime_str else datetime.now()
+            except ValueError:
+                dt = datetime.now()
+            
             amount = request.POST['amount']
             buy_price = request.POST['buy_price']
-            # Add stock
-            StockItem.objects.create(product_stock=p_stock, quantity=amount, date=dt, buy_price=buy_price)
+            StockItem.objects.create(
+                product_stock=p_stock,
+                quantity=amount,
+                date=dt,
+                buy_price=buy_price
+            )
             p_stock.stock = p_stock.total_stock()
             p_stock.save()
+        
         return redirect('products:index')
+    
     return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})

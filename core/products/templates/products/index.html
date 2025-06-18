@@ -12,7 +12,6 @@
             <tr>
                 <th>Nombre</th>
                 <th>Precio</th>
-                <th>Stock</th>
                 <th>Categoria</th>
                 <th>Vendedor</th>
             </tr>
@@ -22,7 +21,6 @@
             <tr>
                 <td class=" d-flex justify-content-between">{{product.name}}<a href="{% url 'products:edit' %}?id={{ product.id }}">Editar</a></td>
                 <td>{{product.sell_price}}</td>
-                <td>{{product.stock}}</td>
                 <td>{{product.category}}</td>
                 <td>{{product.vendor}}</td>
             </tr>    
@@ -32,7 +30,6 @@
             <tr>
                 <th>Nombre</th>
                 <th>Precio</th>
-                <th>Stock</th>
                 <th>Categoria</th>
                 <th>Vendedor</th>
             </tr>

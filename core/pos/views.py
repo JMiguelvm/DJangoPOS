@@ -86,10 +86,11 @@ def get_stock(request):
             [item.id, item.product.id],
             item.product.name,
             item.product.sell_price,
-            item.product.category.name,
+            item.product.category.name if item.product.category else None,
             item.stock,
             item.product.iva
         ]for item in products_stock]
+        print(data)
         return JsonResponse({'status': 'success', 'data': data})
     else:
         return JsonResponse({'status': 'error'})
