@@ -7,7 +7,7 @@
 <script src="{% static 'js/dataTables1.js' %}"></script>
 <script src="{% static 'js/notify.min.js' %}"></script>
 <script src="{% static 'js/jquery-confirm.min.js' %}"></script>
-<div class="container align-content-center overflow-auto " style="margin:  5rem auto;">
+<div class="container align-content-center overflow-auto " style="margin:  2rem auto; width: 65vw;">
     <div class="form-group text-center mb-3">
         <h3 class="m-0"><a href="{% url 'products:index' %}">{{ product_s.product.name }}</a></h3>
         <small class="text-info"><i>Inventario actual: {{ product_s.stock }}</i></small>
@@ -52,7 +52,7 @@
             {% csrf_token %}
             <div class=" input-group">
                 <input type="hidden" name="id" value="{{ product_s.id }}">
-                <input type="datetime-local" name="datetime" class="form-control" required>
+                <input type="datetime-local" name="datetime" class="form-control" value="{{ datetime }}" required>
                 <input type="number" min="0" name="amount" placeholder="Cantidad" class="form-control" required>
                 <input type="number" min="0" name="price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
                 <button class="btn btn-outline-secondary" type="submit">Aceptar</button>

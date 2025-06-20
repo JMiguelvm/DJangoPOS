@@ -4,7 +4,7 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
-<div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
+<div class="container align-content-start overflow-auto text-center" style="margin:  2rem auto; width: 800px;">
     <div class="form-group">
         <h3 class="m-0">{{ product.name }}</h3>
         <small class="text-muted">ID: {{ product.id }}</small>
@@ -20,7 +20,6 @@
             <input name="name" type="text" class="form-control" placeholder="Nombre de producto" value="{{ product.name }}" required>
         </div>
         <!-- SELL PRICE -->
-        <small><i>*Nota: El precio del producto NO debe de incluir el IVA al estar activo, el sistema cálcula automáticamente el IVA sobre el PRECIO del producto.</i></small>
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Precio de producto:</h6>
             <span class="input-group-text" id="basic-addon1"><span class="fas fa-dollar-sign"></span></span>
@@ -39,7 +38,7 @@
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Categoria:</h6>
             <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-list"></span></label>
-            <select name="category" class="form-select" id="inputGroupSelect01" required>
+            <select name="category" class="form-select" id="inputGroupSelect01">
                 <option disabled value="" selected>Seleccione...</option>
                 {% for category in categorys %}
                 <option value="{{category.id}}" {% if category.id == product.category.id %}selected{% endif %}>{{category.name}}</option>
@@ -50,7 +49,7 @@
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Vendedor:</h6>
             <label class="input-group-text" for="inputGroupSelect01"><span class="fas fa-truck-ramp-box"></span></label>
-            <select name="vendor" class="form-select" id="inputGroupSelect01" required>
+            <select name="vendor" class="form-select" id="inputGroupSelect01">
                 <option disabled value="" selected>Seleccione...</option>
                 {% for vendor in vendors %}
                 <option value="{{vendor.id}}" {% if vendor.id == product.vendor.id %}selected{% endif %}>{{vendor.name}}</option>
@@ -82,6 +81,7 @@
 
     $(document).ready(function() {
         $('#bar-code').on('keydown', function(event) {
+            event.preventDefault();
             if (event.keyCode === 13) {
                 $('#bar-code').prop("readonly", true)
             }

@@ -11,10 +11,11 @@ def index(request):
 
 def edit(request):
     product_s = ProductStock.objects.get(id=request.GET.get('product_s'))
+    current_datetime = datetime.now().strftime('%Y-%m-%dT%H:%M')
     items = product_s.stockitem_set.all()
     for item in items:
         item.total = item.buy_price * item.quantity
-    return render(request, "stock/edit.html", {"product_s": product_s, "items": items})
+    return render(request, "stock/edit.html", {"product_s": product_s, "items": items, "datetime": current_datetime})
 
 def create(request):
     products_in_stock = ProductStock.objects.values('product')

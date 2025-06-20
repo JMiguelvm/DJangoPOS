@@ -4,7 +4,7 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
-<div class="container align-content-start overflow-auto text-center" style="margin:  5rem auto; width: 1000px;">
+<div class="container align-content-start overflow-auto text-center" style="margin:  2rem auto; width: 65vw;">
     <div class="form-group">
         <h3 class="m-0 pb-3">Crear producto</h3>
     </div>
@@ -16,17 +16,7 @@
             <span class="input-group-text" id="basic-addon1"><span class="fas fa-dice-d6"></span></span>
             <input name="name" type="text" class="form-control" placeholder="Nombre de producto" required>
         </div>
-        <!-- CALCULATE PRICE -->
-        <div id="calculatePrice" style="display: none;" class="border-info border-bottom border-top p-2">
-            <h6 class=" navbar-text m-0 p-0">Calcular precio de venta (sin iva) y precio de compra en base a precio de venta final:</h6>
-            <div class="input-group mb-3">
-                <span class="input-group-text"><span class="fas fa-dollar-sign"></span></span>
-                <input type="number" value="0" class="form-control" id="inputCalculate" placeholder="Ingrese el precio de venta final">
-                <button type="button" class="btn btn-outline-secondary" id="btnCalculatePrice">Calcular</button>
-            </div>
-        </div>
         <!-- SELL PRICE -->
-        <small><i>*Nota: El precio del producto NO debe de incluir el IVA, el sistema cálcula automáticamente el IVA sobre el PRECIO de venta del producto.</i></small>
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Precio de producto:</h6>
             <span class="input-group-text" id="basic-addon1"><span class="fas fa-dollar-sign"></span></span>
@@ -75,18 +65,15 @@
         <div id="invDiv" style="display: none;">
             <h6 class=" navbar-text m-0 p-0">Crear producto con inventario inicial:</h6>
             <div class=" input-group mb-3 mt-3">
-                <input type="datetime-local" name="datetime" class="form-control" required>
-                <input type="number" min="0" name="amount" id="cBuyPrice" placeholder="Cantidad" class="form-control" required>
-                <input type="number" min="0" name="buy_price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
+                <input type="number" min="0" name="amount" id="cAmmount" placeholder="Cantidad" class="form-control">
+                <input type="number" min="0" name="buy_price" id="cBuyPrice" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control">
             </div>
         </div>
         
         <!-- SUBMIT -->
         <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
             <a href="{% url 'products:index' %}" class="btn btn-outline-secondary">Cancelar</a>
-            <input type="checkbox" class="btn-check" name="initial_inv" id="btn-calculate" autocomplete="off">
-            <label class="btn btn-outline-secondary" for="btn-calculate">Calcular precio</label>
-            <input type="checkbox" class="btn-check" name="initial_inv" id="btn-inv" autocomplete="off">
+            <input type="checkbox" class="btn-check" name="initial_inv" id="btn-inv">
             <label class="btn btn-outline-primary" for="btn-inv">¿Inventario inicial?</label>
             <button type="submit" class="btn btn-outline-success">Guardar</button>
         </div>
@@ -97,22 +84,15 @@
 
     $(document).ready(function() {
         $('#bar-code').on('keydown', function(event) {
+            event.preventDefault();
             if (event.keyCode === 13) {
                 $('#bar-code').prop("readonly", true)
             }
         });
         $("#btn-inv").click(function (e) {
             $("#invDiv").toggle();
-        });
-        $("#btn-calculate").click(function (e) {
-            $("#calculatePrice").toggle();
-        });
-        $("#btnCalculatePrice").click(function (e) {
-            if ($("#inputCalculate").val() != 0) {
-                let input = parseInt($("#inputCalculate").val())/1.39
-                $("#cBuyPrice").val(input.toFixed());
-                $("#cSellPrice").val((input*1.20).toFixed());
-            }
+            $("#cAmmount").prop("required", $("#invDiv").is(":visible"));
+            $("#cBuyPrice").prop("required", $("#invDiv").is(":visible"));
         });
     });
     

@@ -22,8 +22,10 @@ def edit(request):
         product.name = request.POST['name']
         product.sell_price = request.POST['price']
         product.iva = True if request.POST.get("iva") else False
-        product.category = Category.objects.get(id=request.POST['category'])
-        product.vendor = Vendor.objects.get(id=request.POST['vendor'])
+        category_id = request.POST.get("category")
+        category = Category.objects.get(id=category_id) if category_id and category_id.isdigit() else None
+        vendor_id = request.POST.get("vendor")
+        vendor = Vendor.objects.get(id=vendor_id) if vendor_id and vendor_id.isdigit() else None
         product.description = request.POST['description']
         product.bar_code = request.POST['bar_code']
         product.save()
@@ -40,6 +42,7 @@ def edit(request):
 def create(request):
     vendors = Vendor.objects.all()
     categorys = Category.objects.all()
+    current_datetime = datetime.now().strftime('%Y-%m-%dT%H:%M')
     
     if request.method == "POST":
         name = request.POST['name']
@@ -68,12 +71,7 @@ def create(request):
         # Inventario inicial
         if request.POST.get('initial_inv'):
             p_stock = ProductStock.objects.create(product=product)
-            datetime_str = request.POST.get('datetime')
-            try:
-                dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M') if datetime_str else datetime.now()
-            except ValueError:
-                dt = datetime.now()
-            
+            dt = datetime.now()
             amount = request.POST['amount']
             buy_price = request.POST['buy_price']
             StockItem.objects.create(
@@ -87,4 +85,4 @@ def create(request):
         
         return redirect('products:index')
     
-    return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys})
+    return render(request, "products/create.html", {"vendors": vendors, "categorys": categorys, "datetime": current_datetime})
