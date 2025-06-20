@@ -126,45 +126,54 @@ function Product(id, name, sell_price, stock, p_stock_id, iva) {
     // Método para actualizar la UI
     this.updateUI = function() {
         if ($("#sTotal").text() == 0 || $("#sTotal").text() == "$0") {
-            $("#btnDraft").prop( "disabled", false );
-            $("#makeOrder").prop( "disabled", false );
+            $("#btnDraft").prop("disabled", false);
+            $("#makeOrder").prop("disabled", false);
         }
+
         $(`#${this.t_quantity}`).val(this.quantity);
-        $(`#${this.t_total}`).text((this.sell_price * this.quantity)); // .text() en lugar de .val()
+        $(`#${this.t_total}`).text(this.sell_price * this.quantity);
         $(`#${this.t_total}`).priceFormat({
             allowNegative: true,
             centsLimit: 0,
             prefix: '$'
         });
+
         let subtotal = 0;
-        let iva = 0;
-        $(".p_card_price").each(function( key, value ) {
-            subtotal += parseInt($(".p_card_price").eq(key).unmask());
-            if(!($(".p_card_price").eq(key).hasClass('noIVA'))) {
-                iva += parseInt($(".p_card_price").eq(key).unmask());
+        let ivaBase = 0;
+
+        $(".p_card_price").each(function(key, value) {
+            let raw = $(this).text().replace(/[^0-9.-]+/g, ""); // Si tiene priceformat, lo quita
+            let amount = parseFloat(raw);
+            subtotal += amount;
+            if (!$(this).hasClass('noIVA')) {
+                ivaBase += amount;
             }
         });
-        iva = (iva/100)*19;
+
+        let iva = (ivaBase * 19) / 100;
         let total = subtotal + iva;
-        $("#sSubtotal").text(subtotal);
+
+        $("#sSubtotal").text(subtotal.toFixed());
         $("#sSubtotal").priceFormat({
             allowNegative: true,
             centsLimit: 0,
             prefix: '$'
         });
-        $("#sIva").text(iva);
+
+        $("#sIva").text(iva.toFixed());
         $("#sIva").priceFormat({
             allowNegative: true,
             centsLimit: 0,
             prefix: '$'
         });
-        $("#sTotal").text(total);
+        $("#sTotal").text(total.toFixed());
         $("#sTotal").priceFormat({
             allowNegative: true,
             centsLimit: 0,
             prefix: '$'
         });
     };
+
 
     // Método para renderizar en el DOM
     this.render = function(container = '#cart_product') {
@@ -275,37 +284,39 @@ $(document).ready(function() {
         verifyProductInOrder(data[0][0], data[1], data[2], data[4], data[0][1], data[5]);
     });
     $('#btnBarCode').click(function() {
-        $('#inputBarCode').toggle();
+        $('#inputBarCode').toggle("slow");
+        setTimeout(() => $('#bar-code').focus(), 100);
     });
     function submitBarcode() {
         let bar_code = $('#bar-code').val();
-        $.ajax({
-            type: "POST",
-            url: "/pos/get_product_by_barcode",
-            contentType: 'application/json',
-            data: JSON.stringify({barcode: bar_code}),
-            headers: {'X-CSRFTOKEN': CSRF_TOKEN},
-            success: function (response) {
-                if (response.status == 'success') {
-                    verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id, response.product.iva);
-                    $('#bar-code').val('');
-                    setTimeout(() => $('#bar-code').focus(), 100);
+        if (bar_code == "") {
+            showError("Ingrese un código de barras.")
+            setTimeout(() => $('#bar-code').focus(), 100);
+        }
+        else {
+            $.ajax({
+                type: "POST",
+                url: "/pos/get_product_by_barcode",
+                contentType: 'application/json',
+                data: JSON.stringify({barcode: bar_code}),
+                headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+                success: function (response) {
+                    if (response.status == 'success') {
+                        verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id, response.product.iva);
+                        $('#bar-code').val('');
+                        setTimeout(() => $('#bar-code').focus(), 100);
+                    }
+                    else if (response.status == 'error') {
+                        showError(response.message);
+                    }
                 }
-                else if (response.status == 'error') {
-                    showError(response.message);
-                }
-            }
-        });
+            });
+        }
     }
     $('#bar-code').on('keydown', function(event) {
         if (event.keyCode === 13) {
             submitBarcode();
         }
-    });
-
-    $('#submitBC').on('click', function(e) {
-        e.preventDefault();
-        submitBarcode();
     });
     $('#makeOrder').on('click', function(e) {
         makeOrder(2);

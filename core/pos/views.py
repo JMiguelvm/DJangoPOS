@@ -90,10 +90,9 @@ def get_stock(request):
             item.stock,
             item.product.iva
         ]for item in products_stock]
-        print(data)
         return JsonResponse({'status': 'success', 'data': data})
     else:
-        return JsonResponse({'status': 'error'})
+        return JsonResponse({'status': 'error', 'data': []})
     
 
 @transaction.atomic
@@ -168,12 +167,15 @@ def make_order(request):
 
 def get_orders(request):
     orders = SaleOrder.objects.all()
-    data = [{
-        'id': order.id,
-        'date': order.date.strftime('%Y-%m-%d %H:%M:%S'),
-        'status': order.status
-    }for order in orders]
-    return JsonResponse({'status': 'success', 'data': data})
+    if orders:
+        data = [{
+            'id': order.id,
+            'date': order.date.strftime('%Y-%m-%d %H:%M:%S'),
+            'status': order.status
+        }for order in orders]
+        return JsonResponse({'status': 'success', 'data': data})
+    else:
+        return JsonResponse({'status': 'error', 'data': []})
 
 def get_specific_order(request):
     data = json.loads(request.body)

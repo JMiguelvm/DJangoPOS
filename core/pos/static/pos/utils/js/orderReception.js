@@ -72,23 +72,29 @@ function scanBarCode(content) {
     $(input).on('keydown', function(event) {
         if (event.keyCode === 13) {
             let bar_code = $(input).val();
-            $.ajax({
-                type: "POST",
-                url: "/pos/get_product_by_barcode",
-                contentType: 'application/json',
-                data: JSON.stringify({barcode: bar_code}),
-                headers: {'X-CSRFTOKEN': CSRF_TOKEN},
-                success: function (response) {
-                    if (response.status == 'success') {
-                        receiveProduct(response.product.stock_id, response.product.name, input);
-                        $(input).val('')
+            if (bar_code == "") {
+                $.notify("Ingrese un código de barras.", "error");
+                input.focus()
+            }
+            else {
+                $.ajax({
+                    type: "POST",
+                    url: "/pos/get_product_by_barcode",
+                    contentType: 'application/json',
+                    data: JSON.stringify({barcode: bar_code}),
+                    headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+                    success: function (response) {
+                        if (response.status == 'success') {
+                            receiveProduct(response.product.stock_id, response.product.name, input);
+                            $(input).val('')
+                        }
+                        else if (response.status == 'error') {
+                            showError(response.message, input);
+                        }
                     }
-                    else if (response.status == 'error') {
-                        showError(response.message, input);
-                    }
-                }
-                
-            });
+                    
+                });
+            }
             input.focus();
         }
     });

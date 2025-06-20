@@ -70,7 +70,6 @@
         <div class="input-group mb-3" id="inputBarCode" style="display: none;">
             <span class="input-group-text"><span class="fas fa-barcode"></span></span>
             <input type="text" class="form-control" id="bar-code" placeholder="Seleccione para ingresar código de barras" aria-label="Código de barras">
-            <label class="btn btn-outline-secondary" id="submitBC" for="bar-code">Agregar</label>
         </div>
         <!-- Guardar en borrador -->
         <button class="btn btn-outline-primary w-100" id="btnDraft" type="button" disabled>Guardar en borrador</button>
@@ -110,7 +109,7 @@
 <script>
     $(document).ready(function() {
         $('#dropdbtn').click(function() {
-            $('#dropd').toggle();
+            $('#dropd').toggle("slow");
         });
         $('#actualOrder').click(function() {
             if ($('#allOrders').hasClass("active")) {
