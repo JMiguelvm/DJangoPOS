@@ -36,5 +36,5 @@ def create(request):
         number = request.POST['numberP']
         description = request.POST['description']
         Vendor.objects.create(name=name, numberPhone=number, description=description)
-        return redirect('vendors:create')
+        return redirect('vendors:index')
     return render(request, "vendors/create.html")

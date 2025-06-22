@@ -2,36 +2,38 @@
 
 {% block body %}'
 {% load static %}
-<div class="container-fluid p-3 row bg-secondary-subtle">
-    <div class="row col-9 p-0">
+<script src="{% static 'js/jquery-3.7.1.js' %}"></script>
+<script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
+<div class="container-fluid p-3 row bg-secondary-subtle overflow-y-auto">
+    <div class="row col-12 p-0">
         <div class="gap-2">
             <div class="col-12 row me-0 ms-0">
                 <div class="card bg-primary-subtle border-primary-subtle d-inline-block col me-3" style="width: 100%; height: 120px;">
                     <div class="card-body bg-primary-subtle">
                         <h5 class="card-title">Hoy</h5>
                         <hr>
-                        <span class="badge bg-primary text-bg-primary fs-6">${{r_today}}</span>
+                        <span class="report_price badge bg-primary text-bg-primary fs-6">{{t_today}}</span>
                     </div>
                 </div>
                 <div class="card d-inline-block col me-3" style="width: 100%; height: 120px;">
                     <div class="card-body">
                         <h5 class="card-title">Ayer</h5>
                         <hr>
-                        <span class="badge bg-primary text-bg-primary fs-6">${{r_yesterday}}</span>
+                        <span class="report_price badge bg-primary text-bg-primary fs-6">{{t_yesterday}}</span>
                     </div>
                 </div>
                 <div class="card d-inline-block col me-3" style="width: 100%; height: 120px;">
                     <div class="card-body">
                         <h5 class="card-title">7 días</h5>
                         <hr>
-                        <span class="badge bg-primary text-bg-primary fs-6">${{r_week}}</span>
+                        <span class="report_price badge bg-primary text-bg-primary fs-6">{{t_week}}</span>
                     </div>
                 </div>
                 <div class="card d-inline-block col" style="width: 100%; height: 120px;">
                     <div class="card-body">
                         <h5 class="card-title">30 días</h5>
                         <hr>
-                        <span class="badge bg-primary text-bg-primary fs-6">${{r_month}}</span>
+                        <span class="report_price badge bg-primary text-bg-primary fs-6">{{t_month}}</span>
                     </div>
                 </div>
             </div>
@@ -51,7 +53,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for order in last_orders %}
+                        {% for order in orders %}
                         <tr>
                             <td scope="row"><a href="/order?order={{order.pk}}">{{order.date}}</a></td>
                             <td>
@@ -69,9 +71,9 @@
             </div>
         </div>
     </div>
-    <div class="row col-3 ms-2">
+    <div class="row col-12">
         <div>
-            <div class="bg-white p-4 card" style="height: 95.3vh; overflow:auto;">
+            <div class="bg-white p-4 card w-100" style="overflow:auto;">
                 <h3>Pedidos próximos</h3>
                 <table class="table table-striped">
                     <thead>
@@ -82,9 +84,9 @@
                         </tr>
                     </thead>
                     <tbody>
-                        {% for order in last_orders %}
+                        {% for order in orders %}
                         <tr>
-                            <td scope="row"><a href="/order?order={{order.pk}}">{{order.date}}</a></td>
+                            <td scope="row">{{order.date}}</td>
                             <td>
                                 {% if order.customer == None %}
                                     Sin cliente específico
@@ -103,13 +105,25 @@
     </div>
 </div>
 <script src="{% static 'js/chart.js' %}"></script>
-
-
+    <script>
+    $(document).ready(function() {
+        $.each($(".report_price"), function (indexInArray, valueOfElement) {
+            let number = $(this).text()
+            $(this).text(parseInt(number))
+            $(this).priceFormat({
+                allowNegative: true,
+                centsLimit: 0,
+                prefix: '$'
+            });
+        });
+    });
+	
+    </script>
     <script>
       window.onload = function () {
         var dataPoints = [
         {% for report in reports %}
-         { x: new Date({{report.date|date:"Y"}},({{report.date|date:"m"}}-1),{{report.date|date:"d"}}), y: {{report.amount}} }, 
+         { x: new Date({{report.date|date:"Y"}},({{report.date|date:"m"}})-1,{{report.date|date:"d"}}), y: parseInt({{report.total_income}}) }, 
          {% endfor %}]
         var chart = new CanvasJS.Chart("chartContainer", {
             theme: "light2", // "light1", "dark1", "dark2"

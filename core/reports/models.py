@@ -1,8 +1,7 @@
 from django.db import models
-from django.utils import timezone
 from products.models import Product
 from customers.models import Customer
-from datetime import timedelta, time
+from datetime import datetime, timedelta
 import calendar
 
 class SaleReport(models.Model):
@@ -24,7 +23,7 @@ class SaleOrder(models.Model):
         (2, "Publicada"),
         (3, "Anulada")
     ]
-    date = models.DateTimeField(default=timezone.now)
+    date = models.DateTimeField(default=datetime.now())
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, default=None)
     status = models.IntegerField(choices=options, default=1)
     def __str__(self):
@@ -49,7 +48,7 @@ class OrderItem(models.Model):
         # Call original save method
         super().save(*args, **kwargs)
         if self.order.status == 2:
-            now = timezone.now()
+            now = datetime.now()
             old_sell_total = (old_item.sell_price * old_item.quantity) if old_item else 0
             old_buy_total = (old_item.buy_price * old_item.quantity) if old_item else 0
             total_sell_price = self.sell_price * self.quantity - old_sell_total
