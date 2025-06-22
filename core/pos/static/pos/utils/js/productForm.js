@@ -60,6 +60,12 @@ $(document).ready(function() {
         makeOrder(2);
     });
 
+    // Botón para guardar en borrador
+    $('#btnDraft').on('click', function(e) {
+        saveAsDraft();
+    });
+    
+
     // Renderizar detalle de orden
     function renderOrder(id) {
         $.ajax({
@@ -86,9 +92,12 @@ $(document).ready(function() {
                     i++;
                 });
                 let status = "";
+                let button = "";
                 switch (response.order.status) {
-                    case 1: status = 'Borrador';
-                    break;
+                    case 1: 
+                        status = 'Borrador';
+                        button = `<button type="button" id="loadDraft" data-id="${response.order.id}" class="btn btn-info ms-3">Cargar orden</button>`;
+                        break;
                     case 2: status = 'Publicada';
                     break;
                     case 3: status = 'Anulada';
@@ -101,7 +110,7 @@ $(document).ready(function() {
                     <div class="invoice grid">
                         <div class="grid-body">
                         <div class="invoice-title">
-                            <h2>Orden de venta<br><span class="small">#${response.order.id}</span></h2>
+                            <h2>Orden de venta${button}<br><span class="small">#${response.order.id}</span></h2>
                         </div>
                         <hr>
                         <div class="d-flex justify-content-between">
@@ -144,10 +153,17 @@ $(document).ready(function() {
                     title: false,
                     content: html,
                     onOpenBefore: function () {
+                        let dialog = this;
                         $('.order_sumary_price').priceFormat({
                             allowNegative: true,
                             centsLimit: 0,
                             prefix: '$'
+                        });
+                        // Botón para cargar una orden en borrador
+                        $('#loadDraft').on('click', function(e) {
+                            let id = $(this).data("id");
+                            loadDraft(id);
+                            dialog.close();
                         });
                     },
                     buttons: {
@@ -357,10 +373,6 @@ function verifyProductInOrder(id, name, sell_price, stock, p_stock_id) {
         if (selectedProduct.stock > 0) {
             products.set(id, selectedProduct);
             selectedProduct.render();
-            $(products).each(function( key, value ) {
-                console.log(key)
-                console.log(value)
-            });
         }
         else {
             showError("Este producto no tiene inventario.");
@@ -464,5 +476,88 @@ function makeOrder(type) {
 
     } else {
         $.notify("Debe haber productos en la orden de venta.", "warn");
+    }
+}
+
+function saveAsDraft() {
+    if (products.size > 0) {
+        let data = [1/*type: draft*/, []];
+        products.forEach((value, key) => {
+            data[1].push({
+                "stock_id": key,
+                "quantity": value.quantity
+            });
+        });
+
+        $.ajax({
+            type: "POST",
+            url: "/reports/save_as_draft",
+            contentType: 'application/json',
+            data: JSON.stringify(data),
+            headers: { 'X-CSRFTOKEN': CSRF_TOKEN },
+            success: function (response) {
+                if (response.status === 'success') {
+                    $.notify("Guardado con éxito.", "success");
+                    clearProducts();
+                } else {
+                    $.notify(response.message || "Ocurrió un error desconocido.", "error");
+                }
+            },
+            error: function (xhr) {
+                let message = "Error del servidor.";
+                if (xhr.responseJSON && xhr.responseJSON.message) {
+                    message = xhr.responseJSON.message;
+                }
+                $.notify(message, "error");
+            }
+        });
+
+    } else {
+        $.notify("Debe haber productos en la orden de venta.", "warn");
+    }
+}
+function loadDraft(id) {
+    let data = {
+        "id": id
+    }
+    $.ajax({
+        type: "POST",
+        url: "/reports/load_draft",
+        contentType: 'application/json',
+        data: JSON.stringify(data),
+        headers: { 'X-CSRFTOKEN': CSRF_TOKEN },
+        success: function (response) {
+            clearProducts();
+            response.products.forEach(r_product => {
+                console.log(r_product.name);
+                verifyProductInOrder(r_product.id, r_product.name, r_product.sell_price, r_product.stock, r_product.p_stock_id);
+                product_rendered = products.get(r_product.id);
+                product_rendered.quantity = r_product.quantity;
+                product_rendered.updateUI();
+            });
+            order_list.ajax.reload();
+            if (response.status === 'success') {
+                $.notify("Orden cargada con éxito.", "success");
+            } else {
+                response.messages.forEach(message => {
+                    $.notify(message, "error");
+                });
+                $.notify(("No se pudieron cargar "+response.items_unloaded+" productos"), "error");
+            }
+            
+        },
+        error: function (xhr) {
+            let message = "Error del servidor.";
+            if (xhr.responseJSON && xhr.responseJSON.message) {
+                message = xhr.responseJSON.message;
+            }
+            $.notify(message, "error");
+        }
+    });
+    if ($('#allOrders').hasClass("active")) {
+        $('#allOrders').removeClass("active");
+        $('#actualOrder').addClass("active");
+        $('#cart_product').toggle();
+        $('#order_list').toggle();
     }
 }
