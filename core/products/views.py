@@ -21,7 +21,6 @@ def edit(request):
         product = Product.objects.get(id=request.POST['id'])
         product.name = request.POST['name']
         product.sell_price = request.POST['price']
-        product.iva = True if request.POST.get("iva") else False
         category_id = request.POST.get("category")
         category = Category.objects.get(id=category_id) if category_id and category_id.isdigit() else None
         vendor_id = request.POST.get("vendor")
@@ -54,7 +53,6 @@ def create(request):
         vendor = Vendor.objects.get(id=vendor_id) if vendor_id and vendor_id.isdigit() else None
 
         sell_price = request.POST['price']
-        iva = True if request.POST.get("iva") else False
         description = request.POST['description']
         bar_code = request.POST.get('bar_code')
         
@@ -62,7 +60,6 @@ def create(request):
             name=name,
             category=category,
             sell_price=sell_price,
-            iva=iva,
             vendor=vendor,
             description=description,
             bar_code=bar_code

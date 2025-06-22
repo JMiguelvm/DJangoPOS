@@ -5,7 +5,6 @@ class Product(models.Model):
     name = models.CharField(max_length=128)
     sell_price = models.FloatField(default=0.0)
     stock = models.IntegerField(default=0)
-    iva = models.BooleanField(default=True)
     description = models.TextField(null=True, default=None)
     vendor = models.ForeignKey(Vendor, on_delete=models.SET_NULL, null=True, default=None)
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, default=None)

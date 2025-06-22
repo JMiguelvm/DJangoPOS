@@ -105,7 +105,7 @@ function receiveProduct(id, name, input=null) {
         title: 'Recibir producto: '+name+'',
         content: `
         <input type="number" min="0" name="amount" placeholder="Cantidad" class="form-control" required>
-        <input type="number" min="0" name="price" placeholder="Precio de compra por unidad (Sin IVA)" class="form-control" required>
+        <input type="number" min="0" name="price" placeholder="Precio de compra por unidad" class="form-control" required>
         `,
         onClose: function () {
             if (input) {

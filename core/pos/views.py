@@ -62,7 +62,6 @@ def get_product_by_barcode(request):
                         'name': product.name,
                         'price': product.sell_price,
                         'stock': pstock.stock,
-                        'iva': product.iva,
                         'stock_id': pstock.id
                     }
                 })
@@ -87,8 +86,7 @@ def get_stock(request):
             item.product.name,
             item.product.sell_price,
             item.product.category.name if item.product.category else None,
-            item.stock,
-            item.product.iva
+            item.stock
         ]for item in products_stock]
         return JsonResponse({'status': 'success', 'data': data})
     else:
@@ -128,7 +126,6 @@ def make_order(request):
                     OrderItem.objects.create(
                         order=order,
                         product=product,
-                        iva=data_product['iva'],
                         quantity=quantity_to_sell,
                         sell_price=data_product['sell_price'],
                         buy_price=entrie.buy_price
@@ -151,7 +148,6 @@ def make_order(request):
                     OrderItem.objects.create(
                         order=order,
                         product=product,
-                        iva=data_product['iva'],
                         quantity=quantity_remaining,
                         sell_price=data_product['sell_price'],
                         buy_price=entrie.buy_price
@@ -185,8 +181,7 @@ def get_specific_order(request):
         'product_name': '',
         'quantity': 0,
         'sell_price': 0,
-        'total': 0,
-        'iva': 0,
+        'total': 0
     })
     for item in order_items:
         key = item.product.id
@@ -194,7 +189,6 @@ def get_specific_order(request):
         items[key]['quantity'] += item.quantity
         items[key]['sell_price'] = item.sell_price
         items[key]['total'] += item.quantity*item.sell_price
-        items[key]['iva'] = item.iva
         
 
     data = {

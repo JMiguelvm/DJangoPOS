@@ -13,7 +13,7 @@ class SaleReport(models.Model):
     ]
     type = models.IntegerField(choices=options, default=None, null=True)
     date = models.DateTimeField(null=True) # Siempre date pertenece a el primer día
-    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0) 
+    total_income = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     net_profit = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     def __str__(self):
         return f"ID:{self.id} /-/ {self.total_income} /-/ {self.options[self.type - 1]}"
@@ -33,7 +33,6 @@ class SaleOrder(models.Model):
 class OrderItem(models.Model):
     order = models.ForeignKey(SaleOrder, on_delete=models.CASCADE)
     product = models.ForeignKey(Product, on_delete=models.SET_NULL, null=True)
-    iva = models.BooleanField(default=False)
     quantity = models.PositiveIntegerField()
     sell_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
     buy_price = models.DecimalField(max_digits=10, decimal_places=2, default=0)
@@ -47,15 +46,12 @@ class OrderItem(models.Model):
                 old_item = OrderItem.objects.get(pk=self.pk)
             except OrderItem.DoesNotExist:
                 old_item = None
-
-        if self.product:
-            self.iva = self.product.iva
         # Call original save method
         super().save(*args, **kwargs)
         if self.order.status == 2:
             now = timezone.now()
-            old_sell_total = old_item.sell_price * old_item.quantity if old_item else 0
-            old_buy_total = old_item.buy_price * old_item.quantity if old_item else 0
+            old_sell_total = (old_item.sell_price * old_item.quantity) if old_item else 0
+            old_buy_total = (old_item.buy_price * old_item.quantity) if old_item else 0
             total_sell_price = self.sell_price * self.quantity - old_sell_total
             total_buy_price = self.buy_price * self.quantity - old_buy_total
 

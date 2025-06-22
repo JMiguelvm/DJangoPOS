@@ -24,15 +24,6 @@
             <h6 class=" navbar-text pe-3">Precio de producto:</h6>
             <span class="input-group-text" id="basic-addon1"><span class="fas fa-dollar-sign"></span></span>
             <input name="price" type="number" class="form-control" placeholder="Precio de venta de producto" value="{{ product.sell_price|floatformat:-1 }}" step="any" required>
-            <!-- IVA -->
-            <div class="form-check form-switch m-2">
-                <input class="form-check-input" type="checkbox" name="iva" id="flexSwitchCheckChecked" 
-                {% if product.iva %}
-                    checked
-                {% endif %}
-                    >
-                <label class="form-check-label" for="flexSwitchCheckChecked">IVA</label>
-            </div>
         </div>
         <!-- CATEGORY -->
         <div class="input-group mb-3">
