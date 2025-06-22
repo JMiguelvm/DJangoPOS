@@ -3,6 +3,7 @@ from datetime import datetime
 from datetime import timedelta
 from django.utils import timezone
 from reports.models import SaleReport, SaleOrder
+import random
 
 def dashboard(request):
     yesterday = datetime.now() - timedelta(days=1)
@@ -14,7 +15,7 @@ def dashboard(request):
     t_today = r_today.total_income
     t_week = sum(report.total_income for report in r_week)
     t_month = sum(report.total_income for report in r_month)
-    reports = SaleReport.objects.filter(type=1)
+    reports = SaleReport.objects.filter(type=1).order_by("-date")
     orders = SaleOrder.objects.filter(status=2)[:10]
     return render(request, "dashboard.html", {
         "t_yesterday": t_yesterday,
