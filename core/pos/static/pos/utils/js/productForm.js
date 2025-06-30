@@ -18,6 +18,14 @@ $(document).ready(function() {
         verifyProductInOrder(data[0][0], data[1], data[2], data[4], data[0][1], data[5]);
     });
 
+    // Abrir y cerrar lista de productos
+    $('#bOpenProductList').click(function() {
+        $('#dProductList').toggle("slow");
+    });
+    $('#bCloseProductList').click(function() {
+        $('#dProductList').toggle("slow");
+    });
+
     // Código de barras
     $('#btnBarCode').click(function() {
         $('#inputBarCode').toggle("slow");
@@ -246,11 +254,11 @@ function Product(id, name, sell_price, stock, p_stock_id) {
     this.createElement = function() {
         const html = `
             <div class="p-2 border-bottom" id="${this.t_product}">
-                <div class="card-header modal-header d-flex justify-content-between mb-2">
+                <div class="card-header modal-header d-flex justify-content-between mb-2 p-1 border-bottom">
                     <h5 class="modal-title">${this.name}</h5>
                     <button type="button" class="btn-close" id="${this.t_delete}" aria-label="Close"></button>
                 </div>
-                <div class="flex-fill d-flex justify-content-center align-items-center">
+                <div class="d-flex justify-content-between align-items-center">
                     <div style="width: 300px;">
                         <div class="input-group">
                             <button type="button" class="btn btn-outline-secondary p-subtract">-</button>

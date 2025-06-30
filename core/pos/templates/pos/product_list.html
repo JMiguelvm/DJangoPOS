@@ -4,7 +4,12 @@
     }
 </style>
 <div class="overflow-auto p-1" id="product_list" style="height: 100%;">
-    <h3 class="m-0">Productos</h3>
+    <div class="d-flex justify-content-between">
+        <h3 class="m-0 d-inline-block">Productos</h3>
+        <span class="pointer" id="bCloseProductList">
+            <i class="fas fa-xmark"></i>
+        </span>
+    </div>
     {% comment %} <table id="productos" class="display table table-striped table-bordered table-hover dataTable" style="width:100%;">
         <thead>
             <tr>
