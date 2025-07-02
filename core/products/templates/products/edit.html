@@ -56,8 +56,7 @@
         <div class="input-group mb-3">
             <h6 class=" navbar-text pe-3">Código de barras:</h6>
             <span class="input-group-text"><span class="fas fa-barcode"></span></span>
-            <input name="bar_code" type="text" class="form-control" id="bar-code" placeholder="Código de barras" value="{{ product.bar_code }}" aria-label="Código de barras">
-            <label class="btn btn-outline-secondary" for="bar-code">Editar</label>
+            <input name="bar_code" type="text" class="form-control" id="bar-code" placeholder="Código de barras" value="{{ product.bar_code }}" aria-label="Código de barras" readonly>
         </div>
         <!-- SUBMIT -->
         <div class="btn-group input-group" role="group" aria-label="Basic outlined example">
@@ -67,17 +66,5 @@
         </div>
     </form>
 </div>
-
-<script>
-
-    $(document).ready(function() {
-        $('#bar-code').on('keydown', function(event) {
-            event.preventDefault();
-            if (event.keyCode === 13) {
-                $('#bar-code').prop("readonly", true)
-            }
-        });
-    });
-    
-</script>
+{% include "utils/bcSocketHandler.html" with input_id="bar-code" %}
 {% endblock %}

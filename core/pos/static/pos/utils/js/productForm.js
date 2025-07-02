@@ -227,6 +227,24 @@ $(document).ready(function() {
         renderOrder(data.id);
     });
 
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/pos/');
+
+    socket.onopen = function(e) {
+        console.log("Conexión WebSocket establecida");
+        socket.send(JSON.stringify({'type': 'hello', 'message': 'Hola servidor!'}));
+    };
+    socket.onmessage = function(e) {
+        const response = JSON.parse(e.data);
+        console.log(response)
+        if (response.status == 'success') {
+            verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id);
+            $('#bar-code').val('');
+            setTimeout(() => $('#bar-code').focus(), 100);
+        }
+        else if (response.status == 'error') {
+            showError(response.message);
+        }
+    };
 });
 
 

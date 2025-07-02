@@ -21,3 +21,4 @@
 .qodo
 /core/reports/__pycache__
 /core/reports/migrations
+core/db.sqlite3

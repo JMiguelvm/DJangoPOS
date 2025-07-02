@@ -1,0 +1,14 @@
+<script>
+    $(document).ready(function() {
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/scan/');
+
+        socket.onopen = function(e) {
+            console.log("Conexión WebSocket establecida");
+        };
+        socket.onmessage = function(e) {
+            const response = JSON.parse(e.data);
+            console.log(response)
+            $('#{{ input_id }}').val(response);
+        };
+    });
+</script>
