@@ -8,6 +8,7 @@ var order_list, productTable;
    ========================= */
 
 $(document).ready(function() {
+    var receive_products = false;
     // Tabla de productos
     productTable = pCreateTable(["id","Nombre", "Precio", "Categoria", "Inventario"], $("#product_list"), '/pos/get_stock');
     $("#product_list > .dt-container").css("width", "100%");
@@ -24,12 +25,6 @@ $(document).ready(function() {
     });
     $('#bCloseProductList').click(function() {
         $('#dProductList').toggle("slow");
-    });
-
-    // Código de barras
-    $('#btnBarCode').click(function() {
-        $('#inputBarCode').toggle("slow");
-        setTimeout(() => $('#bar-code').focus(), 100);
     });
     function submitBarcode() {
         let bar_code = $('#bar-code').val();
@@ -226,25 +221,6 @@ $(document).ready(function() {
         let data = order_list.row(this).data();
         renderOrder(data.id);
     });
-
-    const socket = new WebSocket('ws://' + window.location.host + '/ws/pos/');
-
-    socket.onopen = function(e) {
-        console.log("Conexión WebSocket establecida");
-        socket.send(JSON.stringify({'type': 'hello', 'message': 'Hola servidor!'}));
-    };
-    socket.onmessage = function(e) {
-        const response = JSON.parse(e.data);
-        console.log(response)
-        if (response.status == 'success') {
-            verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id);
-            $('#bar-code').val('');
-            setTimeout(() => $('#bar-code').focus(), 100);
-        }
-        else if (response.status == 'error') {
-            showError(response.message);
-        }
-    };
 });
 
 
@@ -496,6 +472,7 @@ function makeOrder(type) {
                 if (xhr.responseJSON && xhr.responseJSON.message) {
                     message = xhr.responseJSON.message;
                 }
+                console.log(message);
                 $.notify(message, "error");
             }
         });

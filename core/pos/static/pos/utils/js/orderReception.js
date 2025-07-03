@@ -57,49 +57,6 @@ function createTable (name_fields, element, ajax = null, data = null) {
     return dt
 }
 
-function scanBarCode(content) {
-    const container = document.createElement('div');
-    container.style.marginBottom = '20px';
-    
-    let input = document.createElement('input');
-    input.type = 'text';
-    input.placeholder = 'Seleccione para ingresar código de barras.';
-    input.className = 'form-control mb-3';
-    
-    container.appendChild(input);
-    content.append(container);
-    setTimeout(() => input.focus(), 100);
-    $(input).on('keydown', function(event) {
-        if (event.keyCode === 13) {
-            let bar_code = $(input).val();
-            if (bar_code == "") {
-                $.notify("Ingrese un código de barras.", "error");
-                input.focus()
-            }
-            else {
-                $.ajax({
-                    type: "POST",
-                    url: "/pos/get_product_by_barcode",
-                    contentType: 'application/json',
-                    data: JSON.stringify({barcode: bar_code}),
-                    headers: {'X-CSRFTOKEN': CSRF_TOKEN},
-                    success: function (response) {
-                        if (response.status == 'success') {
-                            receiveProduct(response.product.stock_id, response.product.name, input);
-                            $(input).val('')
-                        }
-                        else if (response.status == 'error') {
-                            showError(response.message, input);
-                        }
-                    }
-                    
-                });
-            }
-            input.focus();
-        }
-    });
-}
-
 function receiveProduct(id, name, input=null) {
     dialog = $.confirm({
         title: 'Recibir producto: '+name+'',
@@ -176,12 +133,44 @@ function productList(response) {
 }
 
 $(document).ready(function() {
+
+    const socket = new WebSocket('ws://' + window.location.host + '/ws/pos/');
+    socket.onopen = function(e) {
+        console.log("Conexión WebSocket establecida");
+        socket.send(JSON.stringify({'type': 'hello', 'message': 'Hola servidor!'}));
+    };
+    socket.onmessage = function(e) {
+        const response = JSON.parse(e.data);
+        if (response.status == 'success') {
+            verifyProductInOrder(response.product.id, response.product.name, response.product.price, response.product.stock, response.product.stock_id);
+            $('#bar-code').val('');
+            setTimeout(() => $('#bar-code').focus(), 100);
+        }
+        else if (response.status == 'error') {
+            showError(response.message);
+        }
+    };
+
   $("#recieve").click(function () {
+    let original_socket_msg = socket.onmessage;
     dialog = $.confirm({
         title: 'Recibir un pedido',
-        content: 'Seleccione el vendedor del producto que desea recibir:',
+        content: 'Escanee un producto o seleccione el vendedor del producto que desea recibir:',
         onContentReady: function () {
-            scanBarCode(this.$content[0]);
+            socket.onmessage = function(e) {
+                const response = JSON.parse(e.data);
+                if (response.status == "success") {
+                    receiveProduct(response.product.stock_id, response.product.name)
+                }
+                else if (response.status == "error") {
+                    $.notify(response.message, "error");
+                }
+                else {
+                    $.notify("Ocurrio un error desconocido.", "error");
+                    dialog.close()
+                }
+            };
+            // Creación de tabla de vendedores
             dt = createTable (["id", "Nombre", "Número"], this.$content[0], '/pos/get_vendor')
             dt.on('click', 'tbody tr', function () { 
                 let data = dt.row(this).data();
@@ -204,6 +193,9 @@ $(document).ready(function() {
                 });
                 dialog.close()
             });
+        },
+        onClose: function () {
+            socket.onmessage = original_socket_msg;
         },
         buttons: {
             cancelar: function () {

@@ -4,6 +4,7 @@ from django.contrib import messages
 from django.db.models import Subquery
 from .models import ProductStock, StockItem, Product
 from datetime import datetime
+from django.utils import timezone
 
 def index(request):
     pstock = ProductStock.objects.all()
@@ -11,7 +12,7 @@ def index(request):
 
 def edit(request):
     product_s = ProductStock.objects.get(id=request.GET.get('product_s'))
-    current_datetime = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    current_datetime = timezone.now().strftime('%Y-%m-%dT%H:%M')
     items = product_s.stockitem_set.all()
     for item in items:
         item.total = item.buy_price * item.quantity
@@ -39,7 +40,7 @@ def create(request):
             try:
                 dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
             except ValueError:
-                dt = datetime.now()
+                dt = timezone.now()
         product_s = ProductStock.objects.get(id=request.POST['id'])
         amount = request.POST['amount']
         price = request.POST['price']

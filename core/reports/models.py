@@ -2,6 +2,7 @@ from django.db import models
 from products.models import Product
 from customers.models import Customer
 from datetime import datetime, timedelta
+from django.utils import timezone
 import calendar
 
 class SaleReport(models.Model):
@@ -23,7 +24,7 @@ class SaleOrder(models.Model):
         (2, "Publicada"),
         (3, "Anulada")
     ]
-    date = models.DateTimeField(default=datetime.now())
+    date = models.DateTimeField(default=timezone.now)
     customer = models.ForeignKey(Customer, on_delete=models.SET_NULL, null=True, default=None)
     status = models.IntegerField(choices=options, default=1)
     def __str__(self):
@@ -48,7 +49,7 @@ class OrderItem(models.Model):
         # Call original save method
         super().save(*args, **kwargs)
         if self.order.status == 2:
-            now = datetime.now()
+            now = timezone.now()
             old_sell_total = (old_item.sell_price * old_item.quantity) if old_item else 0
             old_buy_total = (old_item.buy_price * old_item.quantity) if old_item else 0
             total_sell_price = self.sell_price * self.quantity - old_sell_total
@@ -77,7 +78,7 @@ class OrderItem(models.Model):
             
             # --------- REPORT WEEK --------------
             # Check if had report in that week
-            start_of_week = start_of_day.replace(day=start_of_day.day - start_of_day.weekday())
+            start_of_week = start_of_day - timedelta(days=start_of_day.weekday())
             end_of_week = end_of_day + timedelta(days=(6 - start_of_week.weekday()))
             report_week = SaleReport.objects.filter(
             date__range=(start_of_week, end_of_week),

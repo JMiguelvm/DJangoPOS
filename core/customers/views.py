@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.urls import reverse
 from .models import Customer, Debt
 from datetime import datetime
+from django.utils import timezone
 
 def index(request):
     customers = Customer.objects.all()
@@ -51,7 +52,7 @@ def create(request):
             try:
                 dt = datetime.strptime(datetime_str, '%Y-%m-%dT%H:%M')
             except ValueError:
-                dt = datetime.now()
+                dt = timezone.now()
         customer = Customer.objects.get(id=request.POST['id'])
         amount = request.POST['amount']
         Debt.objects.create(customer=customer, amount=amount, date=dt)

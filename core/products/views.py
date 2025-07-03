@@ -4,6 +4,7 @@ from vendors.models import Vendor
 from categorys.models import Category
 from stock.models import ProductStock, StockItem
 from datetime import datetime
+from django.utils import timezone
 
 def index(request):
     products = Product.objects.all()
@@ -41,7 +42,7 @@ def edit(request):
 def create(request):
     vendors = Vendor.objects.all()
     categorys = Category.objects.all()
-    current_datetime = datetime.now().strftime('%Y-%m-%dT%H:%M')
+    current_datetime = timezone.now().strftime('%Y-%m-%dT%H:%M')
     
     if request.method == "POST":
         name = request.POST['name']
@@ -68,7 +69,7 @@ def create(request):
         # Inventario inicial
         if request.POST.get('initial_inv'):
             p_stock = ProductStock.objects.create(product=product)
-            dt = datetime.now()
+            dt = timezone.now()
             amount = request.POST['amount']
             buy_price = request.POST['buy_price']
             StockItem.objects.create(

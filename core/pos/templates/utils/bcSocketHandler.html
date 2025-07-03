@@ -7,7 +7,6 @@
         };
         socket.onmessage = function(e) {
             const response = JSON.parse(e.data);
-            console.log(response)
             $('#{{ input_id }}').val(response);
         };
     });

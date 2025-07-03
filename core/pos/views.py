@@ -7,7 +7,10 @@ from reports.models import SaleOrder, OrderItem
 from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from collections import defaultdict
+from django.utils.timezone import localtime 
 import json
+import traceback
+
 def index(request):
     return render(request, "pos/index.html")
 
@@ -159,14 +162,20 @@ def make_order(request):
             p_stock.save()
         return JsonResponse({'status': 'success'})
     except Exception as e:
-        return JsonResponse({'status': 'error', 'message': str(e)})
+        print("Error en creación de orden:")
+        print(traceback.format_exc())
+        transaction.set_rollback(True)
+        return JsonResponse({
+            'status': 'error',
+            'message': f"Error procesando producto {data_product.get('stock_id')}: {str(e)}"
+        }, status=400)
 
 def get_orders(request):
     orders = SaleOrder.objects.all()
     if orders:
         data = [{
             'id': order.id,
-            'date': order.date.strftime('%Y-%m-%d %H:%M:%S'),
+            'date': localtime(order.date).strftime('%Y-%m-%d %H:%M:%S'),
             'status': order.status
         }for order in orders]
         return JsonResponse({'status': 'success', 'data': data})
@@ -189,12 +198,11 @@ def get_specific_order(request):
         items[key]['quantity'] += item.quantity
         items[key]['sell_price'] = item.sell_price
         items[key]['total'] += item.quantity*item.sell_price
-        
 
     data = {
         'order': {
             'id': order.id,
-            'date': order.date.strftime('%#d de %B de %Y a las %H:%M').capitalize(),
+            'date': localtime(order.date).strftime('%#d de %B de %Y a las %H:%M').capitalize(),
             'status': order.status
         },
         'items': [

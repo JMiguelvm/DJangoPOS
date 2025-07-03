@@ -49,13 +49,13 @@
                         <tr>
                             <th>Fecha</th>
                             <th>Cliente</th>
-                            <th>Estado</th>
+                            <th>Total venta</th>
                         </tr>
                     </thead>
                     <tbody>
                         {% for order in orders %}
                         <tr>
-                            <td scope="row"><a href="/order?order={{order.pk}}">{{order.date}}</a></td>
+                            <td scope="row">{{order.date}}</td>
                             <td>
                                 {% if order.customer == None %}
                                     Sin cliente específico
@@ -63,7 +63,7 @@
                                     {{ order.customer }}
                                 {% endif %}
                             </td>
-                            <td>{{order.status}}</td>
+                            <td class="report_price">{{order.total_sell_value}}</td>
                         </tr>
                         {% endfor %}
                     </tbody>
