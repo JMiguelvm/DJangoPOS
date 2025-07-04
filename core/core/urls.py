@@ -16,6 +16,13 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
+from django.conf import settings
+from django.conf.urls import handler404, handler500
+from dashboard import views  # Ajusta según tu estructura
+
+handler404 = views.error_404
+handler500 = views.error_500
+
 
 urlpatterns = [
     path("", include("dashboard.urls")),

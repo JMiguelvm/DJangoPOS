@@ -1,0 +1,88 @@
+<head>
+        <title>Error 404</title>
+        {% load static %}
+        <link rel="stylesheet" href="{% static 'css/font-awesome.css' %}">
+        <link rel="stylesheet" href="{% static 'css/font-awesome/css/all.css' %}">
+</head>
+<main>
+  <h1>4<span><i class="fas fa-ghost"></i></span>4</h1>
+  <h2>Error: 404 página no encontrada</h2>
+  <p>Lo siento, la página que buscas no está disponible. Si ves este error otra vez contacta al desarrollador.</p>
+  <a href="{% url 'dashboard' %}">Volver al inicio</a>
+</main>
+
+<style>
+
+$ghost: #528cce;
+$heading: #e7ebf2;
+
+*,
+*:after,
+*:before {
+  box-sizing: border-box;
+}
+
+body {
+  background-color: rgb(165, 165, 165);
+  font-family: 'Arial', sans-serif;
+}
+
+main {
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  height: 100vh;
+  justify-content: center;
+  text-align: center;
+}
+
+h1 {
+  color: $heading;
+  font-size: 12.5rem;
+  letter-spacing: .10em;
+  margin: .025em 0;
+  text-shadow: .05em .05em 0 rgba(0,0,0,.25);
+  white-space: nowrap;
+  
+  @media(max-width: 30rem) {
+    font-size: 8.5rem;
+  }
+  
+  & > span {
+    animation: spooky 2s alternate infinite linear;
+    color: #2d9299;
+    display: inline-block;
+  }
+}
+
+h2 {
+  color: $heading;
+  margin-bottom: .40em;
+}
+
+p {
+  color: #f3f3f3;
+  margin-top: 0;
+}
+
+a {
+  border-radius: 50px;
+  padding: 8px 24px;
+  font-size: 16px;
+  cursor: pointer;
+  text-decoration: none;
+  background: #333333;
+  color: #fff;
+  border: none;
+}
+
+@keyframes spooky {
+  from {
+    transform: translatey(.15em) scaley(.95);
+  }
+  
+  to {
+    transform: translatey(-.15em);
+  }
+}
+</style>
