@@ -19,10 +19,9 @@
                 <button class="btn btn-outline-secondary" type="button" id="dropdbtn"><span class="fas fa-angle-left"></span></button>
                 <a class="btn btn-outline-danger" href="/"><span class="fas fa-xmark fs-5"></span></a>
             </div>
-            <ul class="dropdown-menu" id="dropd" style="left: auto; right: 100%; top: 0;">
+            <ul class="dropdown-menu z-2" id="dropd" style="left: auto; right: 100%; top: 0;">
               <li><button class="dropdown-item btn" id="recieve">Recibir pedido</button></li>
-              <li><a class="dropdown-item" href="#">Another action</a></li>
-              <li><a class="dropdown-item" href="#">Something else here</a></li>
+              <li><button class="dropdown-item btn">Deudas clientes</button></li>
               <li><hr class="dropdown-divider"></li>
               <li><a class="dropdown-item" href="#">Separated link</a></li>
             </ul>
@@ -51,12 +50,18 @@
             </p>
         </div>
         <!-- Seleccion cliente -->
-        <div class="input-group mb-3">
-            <select class="form-select">
-                <option selected>Seleccione un cliente:</option>
-                <option value="1">Cliente</option>
-            </select>
-            <button class="btn btn-outline-secondary" type="button">Aceptar</button>
+         <div class="mb-3" id="inputClient" style="display:none;>
+            <label for="customerSelect" class="form-label">Cliente:</label>
+            {% if customers %}
+                <select id="customerSelect" class="form-select">
+                    <option value="">Seleccionar cliente</option>
+                    {% for customer in customers %}
+                        <option value="{{ customer.id }}">{{ customer.name }}</option>
+                    {% endfor %}
+                </select>
+            {% else %}
+                <input type="text" class="form-control" value="Sin clientes" readonly>
+            {% endif %}
         </div>
         <!-- Guardar en borrador -->
         <button class="btn btn-outline-primary w-100" id="btnDraft" type="button" disabled>Guardar en borrador</button>
@@ -71,7 +76,7 @@
                     Cal. Vueltas
                 </span>
             </button> {% endcomment %}
-            <button type="button" class="btn btn-secondary square-button fs-6 m-1" style="height: 80px; width: 100%;">
+            <button type="button" class="btn btn-secondary square-button fs-6 m-1" id="bClient" style="height: 80px; width: 100%;">
                 <i class="fas fa-user-pen d-block fs-4"></i>
                 <span class="d-block">
                     Fiar a cliente
@@ -107,6 +112,9 @@
                 $('#cart_product').toggle();
                 $('#order_list').toggle();
             }
+        });
+        $('#bClient').click(function() {
+            $('#inputClient').toggle("slow");
         });
     });
 </script>

@@ -23,7 +23,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zr&=c4660^50r&w++p)na1%9qx3o%+664ua5k+4$$7t%#$y0-!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = True
 
 ALLOWED_HOSTS = ['localhost', '127.0.0.1']
 
@@ -136,11 +136,12 @@ CHANNEL_LAYERS = {
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.1/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Ruta donde se recolectan los estáticos
-STATICFILES_DIRS = [
-    os.path.join(BASE_DIR, 'dashboard/static'),
-]
+STATIC_URL = "static/"
+STATICFILES_DIRS = [BASE_DIR / "dashboard/static"]
+STATIC_ROOT = BASE_DIR / "staticfiles"
+
+
+
 LOGGING = {
     'version': 1,
     'disable_existing_loggers': False,

@@ -262,6 +262,7 @@ function Product(id, name, sell_price, stock, p_stock_id) {
                     </div>
                     <div style="width: 150px;">
                         <div class="text-center align-content-center">
+                            <i><small id="sP${this.id}">${this.sell_price}</small><small> (c/u)</small></i>
                             <h4><span id="${this.t_total}" class="p_card_price">${this.sell_price * this.quantity}</span></h4>
                         </div>
                     </div>
@@ -320,6 +321,11 @@ function Product(id, name, sell_price, stock, p_stock_id) {
         $(`#${this.t_quantity}`).val(this.quantity);
         $(`#${this.t_total}`).text(this.sell_price * this.quantity);
         $(`#${this.t_total}`).priceFormat({
+            allowNegative: true,
+            centsLimit: 0,
+            prefix: '$'
+        });
+        $(`#sP${this.id}`).priceFormat({
             allowNegative: true,
             centsLimit: 0,
             prefix: '$'
@@ -442,9 +448,14 @@ function pCreateTable (name_fields, element, ajax = null, data = null) {
 // Realiza la orden de venta
 function makeOrder(type) {
     if (products.size > 0) {
-        let data = [type, []];
+        let customer_id = $('#customerSelect').val() || null;
+        let data = {
+            type: type,
+            customer_id: customer_id,
+            products: []
+        };
         products.forEach((value, key) => {
-            data[1].push({
+            data.products.push({
                 "stock_id": key,
                 "quantity": value.quantity,
                 "sell_price": value.sell_price

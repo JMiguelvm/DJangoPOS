@@ -4,6 +4,7 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'js/dataTables1.js' %}"></script>
+<script src="{% static 'js/notify.min.js' %}"></script>
 <div class="container align-content-center overflow-auto " style="margin:  5rem auto;">
     <h3 class="m-0">Productos</h3>
     <small><a href="{% url 'products:create' %}">Añadir</a></small>
@@ -38,5 +39,23 @@
 </div>
 <script>
     new DataTable('#productos');
+</script>
+<script>
+    $(document).ready(function() {
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/pos/');
+        socket.onopen = function(e) {
+            console.log("Conexión WebSocket establecida");
+            socket.send(JSON.stringify({'type': 'hello', 'message': 'Hola servidor!'}));
+        };
+        socket.onmessage = function(e) {
+            const response = JSON.parse(e.data);
+            if (response.status == 'success') {
+                location.replace('edit/?id='+response.product.id)
+            }
+            else if (response.status == 'error') {
+                $.notify(response.message, "error");
+            }
+        };
+    });
 </script>
 {% endblock %}

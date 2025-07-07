@@ -8,11 +8,14 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.db import transaction
 from collections import defaultdict
 from django.utils.timezone import localtime 
+from customers.models import Customer, Debt
+from django.utils.formats import date_format
 import json
 import traceback
 
 def index(request):
-    return render(request, "pos/index.html")
+    customers = Customer.objects.all()
+    return render(request, "pos/index.html", {"customers": customers})
 
 def get_vendor(request):
     vendor = list(Vendor.objects.values_list("id", "name", "numberPhone"))
@@ -100,9 +103,11 @@ def get_stock(request):
 def make_order(request):
     try:
         data = json.loads(request.body)
-        order = SaleOrder.objects.create(status=data[0])
-        
-        for data_product in data[1]:
+        customer = Customer.objects.filter(id=data.get('customer_id')).first() if data.get('customer_id') else None
+        order = SaleOrder.objects.create(status=data['type'], customer=customer)
+        total_sell = 0
+
+        for data_product in data['products']:
             p_stock = ProductStock.objects.filter(id=data_product['stock_id']).first()
             product = Product.objects.filter(id=p_stock.product.id).first()
             entries = StockItem.objects.filter(
@@ -110,7 +115,7 @@ def make_order(request):
             ).order_by("date")
             
             quantity_to_sell = data_product['quantity']
-            
+            total_sell += data_product['quantity'] * data_product['sell_price'] 
             for entrie in entries:
                 quantity_remaining = entrie.quantity - entrie.quantity_used
                 if quantity_to_sell <= quantity_remaining:
@@ -158,6 +163,8 @@ def make_order(request):
                     
                     if quantity_to_sell == 0:
                         break
+            if customer:
+                Debt.objects.create(customer=customer, amount=total_sell*-1)
             p_stock.stock = p_stock.total_stock()
             p_stock.save()
         return JsonResponse({'status': 'success'})
@@ -167,7 +174,7 @@ def make_order(request):
         transaction.set_rollback(True)
         return JsonResponse({
             'status': 'error',
-            'message': f"Error procesando producto {data_product.get('stock_id')}: {str(e)}"
+            'message': f"Error procesando la orden: {str(e)}"
         }, status=400)
 
 def get_orders(request):
@@ -202,7 +209,7 @@ def get_specific_order(request):
     data = {
         'order': {
             'id': order.id,
-            'date': localtime(order.date).strftime('%#d de %B de %Y a las %H:%M').capitalize(),
+            'date': date_format(localtime(order.date), r'j \d\e F \d\e Y \a \l\a\s H:i').capitalize(),
             'status': order.status
         },
         'items': [
