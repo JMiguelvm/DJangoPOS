@@ -84,16 +84,7 @@ function receiveProduct(id, name, input=null) {
                     headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                     success: function (response) {
                         if (response.status == 'success') {
-                            $.alert({
-                                title: 'Aviso',
-                                content: 'Inventario añadido con éxito.',
-                                onClose: function () {
-                                    if (input) {
-                                        $(input).focus();
-                                        $(input).val('');
-                                    }
-                                }
-                            });
+                            $.notify('Inventario añadido con éxito.', "success");
                             productTable.ajax.reload();
                         }
                         else {

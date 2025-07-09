@@ -49,7 +49,7 @@ class OrderItem(models.Model):
         # Call original save method
         super().save(*args, **kwargs)
         if self.order.status == 2:
-            now = timezone.now()
+            now = timezone.localtime(timezone.now())
             old_sell_total = (old_item.sell_price * old_item.quantity) if old_item else 0
             old_buy_total = (old_item.buy_price * old_item.quantity) if old_item else 0
             total_sell_price = self.sell_price * self.quantity - old_sell_total

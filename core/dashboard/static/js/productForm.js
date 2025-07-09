@@ -513,6 +513,8 @@ function saveAsDraft() {
                 if (response.status === 'success') {
                     $.notify("Guardado con éxito.", "success");
                     clearProducts();
+                    order_list.ajax.reload();
+                    productTable.ajax.reload();
                 } else {
                     $.notify(response.message || "Ocurrió un error desconocido.", "error");
                 }

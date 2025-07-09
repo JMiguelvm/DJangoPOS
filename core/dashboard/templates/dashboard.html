@@ -38,10 +38,13 @@
                 </div>
             </div>
             <div class="bg-white col-12 p-4 card mt-3" style="height: 40vh;">
-                <div id="chartContainer" class="col-6" style="height: 100%; width: 100%;"></div>
+                <div id="chartIncome" class="col-6" style="height: 100%; width: 100%;"></div>
+            </div>
+            <div class="bg-white col-12 p-4 card mt-3" style="height: 40vh;">
+                <div id="chartProfit" class="col-6" style="height: 100%; width: 100%;"></div>
             </div>
         </div>
-        <div class="gap-2">
+        <div class="gap-2 mt-3">
             <div class="bg-white p-4 card" style="height: 40vh; overflow:auto;">
                 <h3>Últimas ventas</h3>
                 <table class="table table-striped">
@@ -65,43 +68,15 @@
                             </td>
                             <td class="report_price">{{order.total_sell_value}}</td>
                         </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-        </div>
-    </div>
-    <div class="row col-12">
-        <div>
-            <div class="bg-white p-4 card w-100" style="overflow:auto;">
-                <h3>Pedidos próximos</h3>
-                <table class="table table-striped">
-                    <thead>
+                        {% empty %}
                         <tr>
-                            <th>Fecha</th>
-                            <th>Empresa</th>
-                            <th>Importe</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for order in orders %}
-                        <tr>
-                            <td scope="row">{{order.date}}</td>
-                            <td>
-                                {% if order.customer == None %}
-                                    Sin cliente específico
-                                {% else %}
-                                    {{ order.customer }}
-                                {% endif %}
-                            </td>
-                            <td>{{order.status}}</td>
+                            <td colspan="3" class="text-center">No hay ventas recientes.</td>
                         </tr>
                         {% endfor %}
                     </tbody>
                 </table>
             </div>
         </div>
-    </div>
     </div>
 </div>
 <script src="{% static 'js/chart.js' %}"></script>
@@ -120,26 +95,42 @@
 	
     </script>
     <script>
-      window.onload = function () {
-        var dataPoints = [
-        {% for report in reports %}
-         { x: new Date({{report.date|date:"Y"}},({{report.date|date:"m"}})-1,{{report.date|date:"d"}}), y: parseInt({{report.total_income}}) }, 
-         {% endfor %}]
-        var chart = new CanvasJS.Chart("chartContainer", {
-            theme: "light2", // "light1", "dark1", "dark2"
-            animationEnabled: true,
-            title:{
-                text: "Ventas este mes"
-            },
-            data: [
-            {
-                type: "area",
-                color: "rgb(10, 88, 202)",
-                dataPoints: dataPoints
-            }
-            ]
-        });
-        chart.render();
-    }
-    </script>
+  window.onload = function () {
+    var dp_income = [
+    {% for report in reports %}
+     { x: new Date({{report.date|date:"Y"}},({{report.date|date:"m"}})-1,{{report.date|date:"d"}}), y: parseInt({{report.total_income}}) }{% if not forloop.last %},{% endif %}
+    {% endfor %}];
+    var income = new CanvasJS.Chart("chartIncome", {
+        theme: "light2",
+        animationEnabled: true,
+        title:{ text: "Ventas este mes" },
+        data: [
+        {
+            type: "area",
+            color: "rgb(10, 88, 202)",
+            dataPoints: dp_income
+        }
+        ]
+    });
+    income.render();
+
+    var dp_profit = [
+    {% for report in reports %}
+     { x: new Date({{report.date|date:"Y"}},({{report.date|date:"m"}})-1,{{report.date|date:"d"}}), y: parseInt({{report.net_profit}}) }{% if not forloop.last %},{% endif %}
+    {% endfor %}];
+    var profit = new CanvasJS.Chart("chartProfit", {
+        theme: "light2",
+        animationEnabled: true,
+        title:{ text: "Ganancias del mes" },
+        data: [
+        {
+            type: "area",
+            color: "rgb(10, 88, 202)",
+            dataPoints: dp_profit
+        }
+        ]
+    });
+    profit.render();
+  }
+</script>
 {% endblock %}
