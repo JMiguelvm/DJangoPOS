@@ -4,6 +4,7 @@
 {% load static %}
 <script src="{% static 'js/jquery-3.7.1.js' %}"></script>
 <script src="{% static 'js/jquery.priceformat.min.js' %}"></script>
+<script src="{% static 'js/notify.min.js' %}"></script>
 <div class="container align-content-start overflow-auto text-center" style="margin:  2rem auto; width: 65vw;">
     <div class="form-group">
         <h3 class="m-0 pb-3">Crear producto</h3>
@@ -76,10 +77,34 @@
         </div>
     </form>
 </div>
-{% include "utils/bcSocketHandler.html" with input_id="bar-code" %}
 <script>
-
+    var CSRF_TOKEN = '{{ csrf_token }}';
     $(document).ready(function() {
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/scan/');
+
+        socket.onopen = function(e) {
+            console.log("Conexión WebSocket establecida");
+        };
+        socket.onmessage = function(e) {
+            const response = JSON.parse(e.data);
+            $.ajax({
+                type: "POST",
+                url: "/pos/get_product_by_barcode",
+                contentType: 'application/json',
+                data: JSON.stringify({barcode: response}),
+                headers: {'X-CSRFTOKEN': CSRF_TOKEN},
+                success: function (response) {
+                    if (response.status == 'success') {
+                        $.notify("Producto con código de barras ya existente.", "error");
+                    }
+                    else if (response.status == 'error' && response.message == "Producto no encontrado") {
+                        $('#bar-code').val(response);
+                    }
+                }
+            });
+            
+        };
+
         $("#cSellPrice").on('input', function(e) {
             console.log("a");
             let current = $(this).val();

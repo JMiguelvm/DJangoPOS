@@ -36,6 +36,23 @@
     </table>
 </div>
 <script>
+    $(document).ready(function() {
+        const socket = new WebSocket('ws://' + window.location.host + '/ws/pos/');
+        socket.onopen = function(e) {
+            console.log("Conexión WebSocket establecida");
+        };
+        socket.onmessage = function(e) {
+            const response = JSON.parse(e.data);
+            if (response.status == 'success') {
+                location.replace('edit/?product_s='+response.stock_id)
+            }
+            else if (response.status == 'error') {
+                $.notify(response.message, "error");
+            }
+        };
+    });
+</script>
+<script>
     new DataTable('#productos');
 </script>
 {% if messages %}
