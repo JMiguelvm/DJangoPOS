@@ -86,19 +86,19 @@
             console.log("Conexión WebSocket establecida");
         };
         socket.onmessage = function(e) {
-            const response = JSON.parse(e.data);
+            const product_code = JSON.parse(e.data);
             $.ajax({
                 type: "POST",
                 url: "/pos/get_product_by_barcode",
                 contentType: 'application/json',
-                data: JSON.stringify({barcode: response}),
+                data: JSON.stringify({barcode: product_code}),
                 headers: {'X-CSRFTOKEN': CSRF_TOKEN},
                 success: function (response) {
                     if (response.status == 'success') {
                         $.notify("Producto con código de barras ya existente.", "error");
                     }
                     else if (response.status == 'error' && response.message == "Producto no encontrado") {
-                        $('#bar-code').val(response);
+                        $('#bar-code').val(product_code);
                     }
                 }
             });

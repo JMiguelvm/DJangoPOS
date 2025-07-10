@@ -33,7 +33,6 @@ class PointOfSale(AsyncJsonWebsocketConsumer):
             "pos_principal",
             self.channel_name
         )
-        print("Desconectado..")
 
 class BCScaning(AsyncJsonWebsocketConsumer):
     def __init__(self, *args, **kwargs):
@@ -63,4 +62,3 @@ class BCScaning(AsyncJsonWebsocketConsumer):
             "scan",
             self.channel_name
         )
-        print("Desconectado..")

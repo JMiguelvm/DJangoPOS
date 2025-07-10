@@ -44,7 +44,7 @@
         socket.onmessage = function(e) {
             const response = JSON.parse(e.data);
             if (response.status == 'success') {
-                location.replace('edit/?product_s='+response.stock_id)
+                location.replace('edit/?product_s='+response.product.stock_id)
             }
             else if (response.status == 'error') {
                 $.notify(response.message, "error");
