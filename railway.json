@@ -1,5 +1,5 @@
 {
   "build": {
-    "command": "python manage.py collectstatic --noinput "
+    "command": "python core/manage.py collectstatic --noinput "
   }
 }
