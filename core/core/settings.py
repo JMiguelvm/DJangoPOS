@@ -14,8 +14,8 @@ from pathlib import Path
 import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
-
+# Railway configuration
+RAILWAY_ENV = os.environ.get('RAILWAY_ENVIRONMENT', False)
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -23,11 +23,14 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-zr&=c4660^50r&w++p)na1%9qx3o%+664ua5k+4$$7t%#$y0-!'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+DEBUG = False
 
-ALLOWED_HOSTS = ['localhost', '127.0.0.1']
-
-
+ALLOWED_HOSTS = [
+    'localhost', 
+    '127.0.0.1',
+    'djangopos-production-01-up.railway.app',
+    '.railway.app'
+]
 # Application definition
 
 INSTALLED_APPS = [
@@ -49,8 +52,10 @@ INSTALLED_APPS = [
     'reports'
 ]
 
+
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -90,6 +95,13 @@ DATABASES = {
         'NAME': BASE_DIR / 'db.sqlite3',
     }
 }
+
+# Railway database configuration
+if RAILWAY_ENV:
+    DATABASES['default'] = dj_database_url.config(
+        conn_max_age=600,
+        conn_health_checks=True,
+    )
 
 
 # Password validation
@@ -140,6 +152,8 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "dashboard/static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
+if RAILWAY_ENV:
+    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 LOGGING = {
