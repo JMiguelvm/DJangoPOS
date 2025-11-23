@@ -15,7 +15,7 @@ import os
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 # Railway configuration
-RAILWAY_ENV = os.environ.get('RAILWAY_ENVIRONMENT', False)
+RAILWAY_ENV = bool(os.environ.get('RAILWAY_STATIC_URL', False))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.1/howto/deployment/checklist/
 
@@ -28,8 +28,13 @@ DEBUG = False
 ALLOWED_HOSTS = [
     'localhost', 
     '127.0.0.1',
-    'djangopos-production-01-up.railway.app',
+    'djangopos-production-042f.up.railway.app',
     '.railway.app'
+]
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://djangopos-production-042f.up.railway.app',
+    'https://*.railway.app'
 ]
 # Application definition
 
@@ -55,7 +60,7 @@ INSTALLED_APPS = [
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
-    'whitenoise.middleware.WhiteNoiseMiddleware',
+    #'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
     'django.middleware.csrf.CsrfViewMiddleware',
@@ -146,8 +151,6 @@ STATIC_URL = "static/"
 STATICFILES_DIRS = [BASE_DIR / "dashboard/static"]
 STATIC_ROOT = BASE_DIR / "staticfiles"
 
-if RAILWAY_ENV:
-    STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
 
 LOGGING = {
